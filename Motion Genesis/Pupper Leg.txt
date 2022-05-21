@@ -1,0 +1,27 @@
+NewtonianFrame N
+RigidBody A,B,C
+RigidFrame Arot, Brot, Crot
+
+Variable qA, qB, qC
+Variable Fx, Fy, Fz, Tx, Ty, Tz
+
+Point foot(C)
+
+
+%--------------------------------------------
+% Mass and Inertia
+
+A.SetMass(mA = 0.200 kg)
+B.SetMass(mB = 0.106 kg)
+C.SetMass(mC = 0.038 kg)
+
+A.SetInertia(Acm, Aixx=1e-03, Aixy=0, Aixz=0 Aiyy=1e-03 Aiyz=0 Aizz=1e-03)
+B.SetInertia(Bcm, Bixx=2e-05 Bixy=0 Bixz=0 Biyy=6e-05 Biyz=0 Bizz=6e-05)
+C.SetInertia(Ccm, Cixx=0.00018 Cixy=0 Cixz=0 Ciyy=0.00018 Ciyz=0 izz=2e-05)
+
+%--------------------------------------------
+% Rotations
+
+A.RotatePositiveZ( N, qA )
+B.RotatePositiveZ( N, qB )
+C.RotatePositiveZ( N, qA )
