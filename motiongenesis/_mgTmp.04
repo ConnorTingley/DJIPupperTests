@@ -1,0 +1,1481 @@
+   (1) NewtonianFrame N
+   (2) RigidBody A,B,C
+   (3) RigidFrame Arot, Brot, Crot, Arot2
+   (4) Variable qA'', qB'', qC''
+   (5) Variable TA, TB, TC
+   (6) Variable Fx, Fy, Fz, Tx, Ty, Tz
+   (7) Point foot(C)
+   (8) Constant g = 9.81 m/s^2
+   (9) %--------------------------------------------
+   (10) % Mass and Inertia
+   (11) A.SetMass(mA = 0.142 kg)
+   (12) B.SetMass(mB = 0.106 kg)
+   (13) C.SetMass(mC = 0.038 kg)
+   (14) A.SetInertia(Acm, Aixx=0.00014 kg*meter^2, Aiyy=0.00016 kg*meter^2, Aizz=3e-05 kg*meter^2, Aixy=0 kg*meter^2, Aiyz=0 kg*meter^2, Aixz=0 kg*meter^2)
+   (15) B.SetInertia(Bcm, Bixx=2e-05 kg*meter^2, Biyy=6e-05 kg*meter^2, Bizz=6e-05 kg*meter^2, Bixy=0 kg*meter^2, Bixz=0 kg*meter^2, Biyz=0 kg*meter^2)
+   (16) C.SetInertia(Ccm, Cixx=0.00018 kg*meter^2, Ciyy=0.00018 kg*meter^2, Cizz=2e-05 kg*meter^2, Cixy=0 kg*meter^2, Cixz=0 kg*meter^2, Ciyz=0 kg*meter^2)
+   (17) %A.SetMass(0.142)
+   (18) %B.SetMass(0.106)
+   (19) %C.SetMass(0.038)
+   (20) %A.SetInertia(Acm, 0.00014, 0.00016, 3e-05, 0, 0, 0)
+   (21) %B.SetInertia(Bcm, 2e-05, 6e-05, 6e-05, 0, 0, 0)
+   (22) %C.SetInertia(Ccm, 0.00018, 0.00018, 2e-05, 0, 0, 0)
+   (23) %--------------------------------------------
+   (24) % Rotations
+   (25) %Arot.RotatePositiveX(N, PI/2)
+   (26) %Arot2.RotateNegativeY(Arot, PI/2)
+   (27) %A.RotateNegativeY( Arot2, qA )
+   (28) Arot.RotatePositiveZ(N, PI/2)
+-> (29) Arot_N = [0, 1, 0;  -1, 0, 0;  0, 0, 1]
+-> (30) w_Arot_N> = 0>
+-> (31) alf_Arot_N> = 0>
+
+   (32) A.RotatePositiveY( Arot, qA )
+-> (33) A_Arot = [cos(qA), 0, -sin(qA);  0, 1, 0;  sin(qA), 0, cos(qA)]
+-> (34) w_A_Arot> = qA'*Ay>
+-> (35) w_A_N> = qA'*Ay>
+-> (36) alf_A_Arot> = qA''*Ay>
+-> (37) alf_A_N> = qA''*Ay>
+
+   (38) Brot.RotatePositiveX(A, PI/2)
+-> (39) Brot_A = [1, 0, 0;  0, 0, 1;  0, -1, 0]
+-> (40) w_Brot_A> = 0>
+-> (41) w_Brot_N> = qA'*Ay>
+-> (42) alf_Brot_A> = 0>
+-> (43) alf_Brot_N> = qA''*Ay>
+
+   (44) B.RotatePositiveX( Brot, qB )
+-> (45) B_Brot = [1, 0, 0;  0, cos(qB), sin(qB);  0, -sin(qB), cos(qB)]
+-> (46) w_B_Brot> = qB'*Bx>
+-> (47) w_B_N> = qB'*Bx> - sin(qB)*qA'*By> - cos(qB)*qA'*Bz>
+-> (48) alf_B_Brot> = qB''*Bx>
+-> (49) alf_B_N> = qB''*Bx> + (-cos(qB)*qA'*qB'-sin(qB)*qA'')*By> + (sin(qB)*
+        qA'*qB'-cos(qB)*qA'')*Bz>
+
+   (50) Crot.RotatePositiveZ(B, PI)
+-> (51) Crot_B = [-1, 0, 0;  0, -1, 0;  0, 0, 1]
+-> (52) w_Crot_B> = 0>
+-> (53) w_Crot_N> = qB'*Bx> - sin(qB)*qA'*By> - cos(qB)*qA'*Bz>
+-> (54) alf_Crot_B> = 0>
+-> (55) alf_Crot_N> = qB''*Bx> + (-cos(qB)*qA'*qB'-sin(qB)*qA'')*By> + (sin(qB)
+        *qA'*qB'-cos(qB)*qA'')*Bz>
+
+   (56) C.RotateNegativeX( Crot, qC )
+-> (57) C_Crot = [1, 0, 0;  0, cos(qC), -sin(qC);  0, sin(qC), cos(qC)]
+-> (58) w_C_Crot> = -qC'*Cx>
+-> (59) w_C_N> = (-qB'-qC')*Cx> + sin(qB+qC)*qA'*Cy> - cos(qB+qC)*qA'*Cz>
+-> (60) alf_C_Crot> = -qC''*Cx>
+-> (61) alf_C_N> = (-qB''-qC'')*Cx> + (cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'
+        +sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))*Cy>
+        + (sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(
+        qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))*Cz>
+
+   (62) %--------------------------------------------
+   (63) % Positions
+   (64) Constant AcmX = 0.0139 m
+   (65) Constant AcmY = 0.0254 m
+   (66) Constant AcmZ = 0 m
+   (67) Constant BoX = 0.0395 m
+   (68) Constant BoY = 0.0265 m
+   (69) Constant BoZ = 0 m
+   (70) Constant BcmX = 0.0172 m
+   (71) Constant BcmY = 0 m
+   (72) Constant BcmZ = -0.061 m
+   (73) Constant CoX = -0.004 m
+   (74) Constant CoY = 0 m
+   (75) Constant CoZ = -0.08 m
+   (76) Constant CcmX = 0.00558 m
+   (77) Constant CcmY = -0.00075 m
+   (78) Constant CcmZ = -0.0658 m
+   (79) Constant footX = 0.002 m
+   (80) Constant footY = 0 m
+   (81) Constant footZ = -0.11 m
+   (82) Ao.Translate(No, 0>)
+-> (83) p_No_Ao> = 0>
+-> (84) v_Ao_N> = 0>
+-> (85) a_Ao_N> = 0>
+
+   (86) Acm.Translate(Ao, AcmX * Ax> + AcmY * Ay> + AcmZ * Az>)
+-> (87) p_Ao_Acm> = AcmX*Ax> + AcmY*Ay> + AcmZ*Az>
+-> (88) v_Acm_N> = AcmZ*qA'*Ax> - AcmX*qA'*Az>
+-> (89) a_Acm_N> = (AcmZ*qA''-AcmX*qA'^2)*Ax> + (-AcmZ*qA'^2-AcmX*qA'')*Az>
+
+   (90) Bo.Translate(Ao, BoX * Ax> + BoY * Ay> + BoZ * Az>)
+-> (91) p_Ao_Bo> = BoX*Ax> + BoY*Ay> + BoZ*Az>
+-> (92) v_Bo_N> = BoZ*qA'*Ax> - BoX*qA'*Az>
+-> (93) a_Bo_N> = (BoZ*qA''-BoX*qA'^2)*Ax> + (-BoZ*qA'^2-BoX*qA'')*Az>
+
+   (94) Bcm.Translate(Bo, BcmX * Bx> + BcmY * By> + BcmZ * Bz>)
+-> (95) p_Bo_Bcm> = BcmX*Bx> + BcmY*By> + BcmZ*Bz>
+-> (96) v_Bcm_N> = BoZ*qA'*Ax> - BoX*qA'*Az> + (BcmY*cos(qB)-BcmZ*sin(qB))*qA'*Bx>
+        + (-BcmZ*qB'-BcmX*cos(qB)*qA')*By> + (BcmY*qB'+BcmX*sin(qB)*qA')*Bz>
+
+-> (97) a_Bcm_N> = (BoZ*qA''-BoX*qA'^2)*Ax> + (-BoZ*qA'^2-BoX*qA'')*Az> + (BcmY
+        *cos(qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*cos(qB)*qB')-BcmZ
+        *sin(qB)*qA'')*Bx> + (-BcmY*qB'^2-cos(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2
+        -BcmZ*qB''-BcmX*cos(qB)*qA'')*By> + (sin(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))
+        *qA'^2+BcmY*qB''+BcmX*sin(qB)*qA''-BcmZ*qB'^2)*Bz>
+
+   (98) Co.Translate(Bo, CoX * Bx> + CoY * By> + CoZ * Bz>)
+-> (99) p_Bo_Co> = CoX*Bx> + CoY*By> + CoZ*Bz>
+-> (100) v_Co_N> = BoZ*qA'*Ax> - BoX*qA'*Az> + (CoY*cos(qB)-CoZ*sin(qB))*qA'*Bx>
+         + (-CoZ*qB'-CoX*cos(qB)*qA')*By> + (CoY*qB'+CoX*sin(qB)*qA')*Bz>
+
+-> (101) a_Co_N> = (BoZ*qA''-BoX*qA'^2)*Ax> + (-BoZ*qA'^2-BoX*qA'')*Az> + ((CoY
+         *cos(qB)-CoZ*sin(qB))*qA''-CoX*qA'^2-2*CoY*sin(qB)*qA'*qB'-2*CoZ*cos(
+         qB)*qA'*qB')*Bx> + (-CoY*qB'^2-cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         -CoZ*qB''-CoX*cos(qB)*qA'')*By> + (sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         +CoY*qB''+CoX*sin(qB)*qA''-CoZ*qB'^2)*Bz>
+
+   (102) Ccm.Translate(Co, CcmX * Cx> + CcmY * Cy> + CcmZ * Cz>)
+-> (103) p_Co_Ccm> = CcmX*Cx> + CcmY*Cy> + CcmZ*Cz>
+-> (104) v_Ccm_N> = BoZ*qA'*Ax> - BoX*qA'*Az> + (CoY*cos(qB)-CoZ*sin(qB))*qA'*Bx>
+         + (-CoZ*qB'-CoX*cos(qB)*qA')*By> + (CoY*qB'+CoX*sin(qB)*qA')*Bz>
+         + (CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'*Cx> + (CcmZ*(qB'+qC')-CcmX*cos
+         (qB+qC)*qA')*Cy> + (-CcmY*(qB'+qC')-CcmX*sin(qB+qC)*qA')*Cz>
+
+-> (105) a_Ccm_N> = (BoZ*qA''-BoX*qA'^2)*Ax> + (-BoZ*qA'^2-BoX*qA'')*Az> + ((
+         CoY*cos(qB)-CoZ*sin(qB))*qA''-CoX*qA'^2-2*CoY*sin(qB)*qA'*qB'-2*CoZ*
+         cos(qB)*qA'*qB')*Bx> + (-CoY*qB'^2-cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         -CoZ*qB''-CoX*cos(qB)*qA'')*By> + (sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         +CoY*qB''+CoX*sin(qB)*qA''-CoZ*qB'^2)*Bz> + (CcmZ*(cos(qC)*(cos(qB)*
+         qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)
+         *qA'*qC'-cos(qB)*qA''))-qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*
+         cos(qB+qC)*(qB'+qC'))-CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+
+         sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))*Cx>
+         + (CcmZ*(qB''+qC'')+CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin
+         (qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-(
+         qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')-cos(qB+qC)*(CcmY*cos(qB+
+         qC)+CcmZ*sin(qB+qC))*qA'^2)*Cy> + (-(qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos
+         (qB+qC)*qA')-sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmY*(
+         qB''+qC'')-CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')
+         -sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))*Cz>
+
+   (106) foot.Translate(Co, footX * Cx> + footY * Cy> + footZ * Cz>)
+-> (107) p_Co_foot> = footX*Cx> + footY*Cy> + footZ*Cz>
+-> (108) v_foot_N> = BoZ*qA'*Ax> - BoX*qA'*Az> + (CoY*cos(qB)-CoZ*sin(qB))*qA'*Bx>
+         + (-CoZ*qB'-CoX*cos(qB)*qA')*By> + (CoY*qB'+CoX*sin(qB)*qA')*Bz>
+         + (footY*cos(qB+qC)+footZ*sin(qB+qC))*qA'*Cx> + (footZ*(qB'+qC')-footX
+         *cos(qB+qC)*qA')*Cy> + (-footY*(qB'+qC')-footX*sin(qB+qC)*qA')*Cz>
+
+-> (109) a_foot_N> = (BoZ*qA''-BoX*qA'^2)*Ax> + (-BoZ*qA'^2-BoX*qA'')*Az>
+         + ((CoY*cos(qB)-CoZ*sin(qB))*qA''-CoX*qA'^2-2*CoY*sin(qB)*qA'*qB'-2*
+         CoZ*cos(qB)*qA'*qB')*Bx> + (-CoY*qB'^2-cos(qB)*(CoY*cos(qB)-CoZ*sin(
+         qB))*qA'^2-CoZ*qB''-CoX*cos(qB)*qA'')*By> + (sin(qB)*(CoY*cos(qB)-CoZ*
+         sin(qB))*qA'^2+CoY*qB''+CoX*sin(qB)*qA''-CoZ*qB'^2)*Bz> + (footZ*(cos(
+         qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*
+         qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-qA'*(footX*qA'+footY*sin(qB+qC)
+         *(qB'+qC')-footZ*cos(qB+qC)*(qB'+qC'))-footY*(sin(qC)*(cos(qB)*qA'*qB'
+         +cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*
+         qC'-cos(qB)*qA'')))*Cx> + (footZ*(qB''+qC'')+footX*(sin(qC)*(cos(qB)*
+         qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)
+         *qA'*qC'-cos(qB)*qA''))-(qB'+qC')*(footY*(qB'+qC')+footX*sin(qB+qC)*
+         qA')-cos(qB+qC)*(footY*cos(qB+qC)+footZ*sin(qB+qC))*qA'^2)*Cy> + (-(
+         qB'+qC')*(footZ*(qB'+qC')-footX*cos(qB+qC)*qA')-sin(qB+qC)*(footY*cos(
+         qB+qC)+footZ*sin(qB+qC))*qA'^2-footY*(qB''+qC'')-footX*(cos(qC)*(cos(
+         qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin
+         (qB)*qA'*qC'-cos(qB)*qA'')))*Cz>
+
+   (110) %-------------------------------------------- 
+   (111) % Forces and Torques
+   (112) System.AddForceGravity( -g*Nz> )
+-> (113) Force_Acm> = -mA*g*Nz>
+-> (114) Force_Bcm> = -mB*g*Nz>
+-> (115) Force_Ccm> = -mC*g*Nz>
+
+   (116) Ao.AddForce(Fx * Nx> + Fy * Ny> + Fz * Nz>)
+-> (117) Force_Ao> = Fx*Nx> + Fy*Ny> + Fz*Nz>
+
+   (118) A.AddTorque(Ty * Ny> + Tz * Nz>)
+-> (119) Torque_A> = Ty*Ny> + Tz*Nz>
+
+   (120) A.AddTorque(N, TA * Ay>)
+-> (121) Torque_A_N> = TA*Ay>
+
+   (122) B.AddTorque(A, TB * Bx>)
+-> (123) Torque_B_A> = TB*Bx>
+
+   (124) C.AddTorque(B, -TC * Cx>)
+-> (125) Torque_C_B> = -TC*Cx>
+
+   (126) %-------------------------------------------- 
+   (127) % Dynamics
+   (128) SetGeneralizedSpeed(qA', qB', qC')
+   (129) Motors = System.GetDynamicsKane()
+-> (130) Motors[1] = 2*Bixz*cos(qB)^2*qA'*qB' + 2*Biyy*sin(qB)*cos(qB)*qA'*qB'
+         + sin(qB)*qB'*(Biyz*qB'-2*Bixz*sin(qB)*qA'-2*Bizz*cos(qB)*qA') + sin(
+         qB+qC)*(qB'+qC')*(2*Ciyy*cos(qB+qC)*qA'+3*Cixz*sin(qB+qC)*qA'-Ciyz*(
+         qB'+qC')-2*Cizz*cos(qB+qC)*qA') + mB*(BcmX*cos(qB)*(BcmY*qB'^2+cos(qB)
+         *(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2)+BoX*cos(qB)*(BcmY*qB'^2+cos(qB)*(
+         BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2)-2*BoZ*(BcmY*sin(qB)+BcmZ*cos(qB))*
+         qA'*qB'-BoX*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2-(BcmX+BoX)*sin(qB)*(BcmZ
+         *qB'^2-sin(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2)-(BcmY*cos(qB)-BcmZ*
+         sin(qB))*qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*cos(qB)*qB')) + (Ciyz
+         *cos(qB+qC)+mB*(BcmX*BcmZ*cos(qB)+BcmZ*BoX*cos(qB)+BcmY*(BcmX+BoX)*sin
+         (qB))-Bixy*sin(qB)-Biyz*cos(qB)-Cixy*sin(qB+qC)-mC*(CcmX*CcmZ*cos(qB+
+         qC)+CcmY*CoX*sin(qC)*cos(qB)+CcmX*CoZ*cos(qC)*cos(qB+qC)-BoX*CoZ*cos(
+         qB)-CoX*CoZ*cos(qB)-BoX*CcmZ*cos(qB+qC)-CcmZ*CoX*cos(qB)*cos(qC)-CcmX*
+         CoY*sin(qC)*cos(qB+qC)-sin(qB)*(BoX*CoY+CoX*CoY-CcmY*CoX*cos(qC)-CcmZ*
+         CoX*sin(qC))-sin(qB+qC)*(CcmX*CcmY-BoX*CcmY-CcmX*CoY*cos(qC)-CcmX*CoZ*
+         sin(qC))))*qB'' + (Aiyy+Bizz+Cizz+mA*(AcmX^2+AcmZ^2)+sin(qB)*(Biyy*sin
+         (qB)+2*Bixz*cos(qB)-Bizz*sin(qB))+sin(qB+qC)*(Ciyy*sin(qB+qC)-2*Cixz*
+         cos(qB+qC)-Cizz*sin(qB+qC))+mB*(BcmX^2+BoX^2+BoZ^2+2*BcmX*BoX+(BcmY*
+         cos(qB)-BcmZ*sin(qB))^2+2*BoZ*(BcmY*cos(qB)-BcmZ*sin(qB)))+mC*(BoX^2+BoZ^2
+         +CcmX^2+CoX^2+2*BoX*CoX+(CoY*cos(qB)-CoZ*sin(qB))^2+(CcmY*cos(qB+qC)+
+         CcmZ*sin(qB+qC))^2+2*BoZ*(CoY*cos(qB)-CoZ*sin(qB))-2*BoX*CcmX-2*CcmX*
+         CoX-2*BoZ*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))-2*(CoY*cos(qB)-CoZ*sin(qB))
+         *(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))))*qA'' - TA - mA*g*(AcmX*cos(qA)+
+         AcmZ*sin(qA)) - mB*g*(BcmX*cos(qA)+BoX*cos(qA)+BoZ*sin(qA)+sin(qA)*(
+         BcmY*cos(qB)-BcmZ*sin(qB))) - mC*g*(BoX*cos(qA)+BoZ*sin(qA)+CoX*cos(
+         qA)+sin(qA)*(CoY*cos(qB)-CoZ*sin(qB))-CcmX*cos(qA)-sin(qA)*(CcmY*cos(
+         qB+qC)+CcmZ*sin(qB+qC))) - Cixz*qA'*(qB'+qC') - Bixy*cos(qB)*qB'^2
+         - cos(qB+qC)*(qB'+qC')*(Cixy*(qB'+qC')+Cixz*cos(qB+qC)*qA') - mC*(BoX*
+         CcmY*cos(qB+qC)*(qB'+qC')^2+2*BoZ*(CoY*sin(qB)+CoZ*cos(qB))*qA'*qB'+2*
+         (CoY*sin(qB)+CoZ*cos(qB))*(CoY*cos(qB)-CoZ*sin(qB))*qA'*qB'+CcmX*cos(
+         qC)*cos(qB+qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)+Cc
+         mX*sin(qC)*cos(qB+qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)
+         +2*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*(CcmY*sin(qB+qC)-CcmZ*cos(qB+qC))
+         *qA'*(qB'+qC')+CoX*cos(qB)*cos(qC)*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin
+         (qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)+CoX*
+         sin(qC)*cos(qB)*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(
+         qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)+sin(qB+qC)*(BoX*CcmZ*(
+         qB'+qC')^2+CcmX*sin(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)
+         -CcmX*CcmZ*(qB'+qC')^2-CcmX*cos(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-
+         CoZ*sin(qB))*qA'^2))-BoX*CoY*cos(qB)*qB'^2-CoX*CoY*cos(qB)*qB'^2-CcmX*
+         CcmY*cos(qB+qC)*(qB'+qC')^2-2*BoZ*(CcmY*sin(qB+qC)-CcmZ*cos(qB+qC))*
+         qA'*(qB'+qC')-(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'*(CoX*qA'+2*CoY*sin
+         (qB)*qB'+2*CoZ*cos(qB)*qB')-(CoY*cos(qB)-CoZ*sin(qB))*qA'*(CcmX*qA'+2*
+         CcmY*sin(qB+qC)*(qB'+qC')-2*CcmZ*cos(qB+qC)*(qB'+qC'))-sin(qB)*(CoX*
+         sin(qC)*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(
+         CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)-BoX*CoZ*qB'^2-CoX*CoZ*qB'^2-
+         CoX*cos(qC)*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)
+         *(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2))) - (Cixy*sin(qB+qC)-Ciyz*
+         cos(qB+qC)-mC*(BoX*CcmZ*cos(qB+qC)+CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CcmZ*
+         cos(qB+qC)-CcmY*CoX*sin(qC)*cos(qB)-CcmY*(BoX-CcmX)*sin(qB+qC)-CoX*sin
+         (qB)*(CcmY*cos(qC)+CcmZ*sin(qC))))*qC''
+
+-> (131) Motors[2] = mC*g*cos(qA)*(CcmY*sin(qB+qC)-CoY*sin(qB)-CoZ*cos(qB)-CcmZ
+         *cos(qB+qC)) + (sin(qB)*(Bixz*sin(qB)+Bizz*cos(qB))-cos(qB)*(Bixz*cos(
+         qB)+Biyy*sin(qB)))*qA'^2 + mB*(BcmY*BoZ*sin(qB)+BcmZ*BoZ*cos(qB)+BcmY*
+         sin(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))+BcmZ*cos(qB)*(BcmY*cos(qB)-BcmZ*
+         sin(qB)))*qA'^2 + mC*(BoZ*CoY*sin(qB)*qA'^2+BoZ*CoZ*cos(qB)*qA'^2+BoZ*
+         CcmZ*cos(qB+qC)*qA'^2+CcmX*CoZ*sin(qB)*qA'*(qB'+qC')+CoY*sin(qB)*(CoY*
+         cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         +CcmY*sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+CcmZ*cos(qC)*
+         (CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)+CcmY*cos(qC)*(CoZ*qB'^2
+         -sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)+CcmZ*sin(qC)*(CoZ*qB'^2-sin(
+         qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)+CoY*sin(qC)*((qB'+qC')*(CcmY*(qB'
+         +qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))
+         *qA'^2)-BoZ*CcmY*sin(qB+qC)*qA'^2-CcmX*CoY*cos(qB)*qA'*(qB'+qC')-CcmZ*
+         cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmY*sin(qC)*(CoY*qB'^2
+         +cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)-CoZ*cos(qC)*((qB'+qC')*(CcmY
+         *(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(
+         qB+qC))*qA'^2)-CoY*cos(qC)*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*
+         qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)-CoZ*sin(qC)*(
+         (qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(
+         qB+qC)+CcmZ*sin(qB+qC))*qA'^2)) + (Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*
+         sin(qC)+CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CcmZ*CoZ*cos(qC)))*qC'' + (Bixx
+         +Cixx+mB*(BcmY^2+BcmZ^2)-mC*(2*CcmY*CoY*cos(qC)+2*CcmY*CoZ*sin(qC)+2*
+         CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CoY^2-CoZ^2-2*CcmZ*CoZ*cos(qC)))*qB''
+         + (Ciyz*cos(qB+qC)+mB*(BcmX*BcmY*sin(qB)+BcmX*BcmZ*cos(qB)+BcmY*BoX*
+         sin(qB)+BcmZ*BoX*cos(qB))-Bixy*sin(qB)-Biyz*cos(qB)-Cixy*sin(qB+qC)-
+         mC*(CcmX*CoY*sin(qB)+CcmX*CoZ*cos(qB)+BoX*CcmY*sin(qB+qC)+CcmX*CcmZ*
+         cos(qB+qC)+CcmY*CoX*sin(qB+qC)-BoX*CoY*sin(qB)-BoX*CoZ*cos(qB)-CoX*CoY
+         *sin(qB)-CoX*CoZ*cos(qB)-BoX*CcmZ*cos(qB+qC)-CcmX*CcmY*sin(qB+qC)-CcmZ
+         *CoX*cos(qB+qC)))*qA'' - TB - mB*g*cos(qA)*(BcmY*sin(qB)+BcmZ*cos(qB))
+         - (sin(qB+qC)*(Cixz*sin(qB+qC)-Cizz*cos(qB+qC))-cos(qB+qC)*(Cixz*cos(
+         qB+qC)-Ciyy*sin(qB+qC)))*qA'^2
+
+-> (132) Motors[3] = mC*g*cos(qA)*(CcmY*sin(qB+qC)-CcmZ*cos(qB+qC)) + (Cixx+mC*
+         (CcmY^2+CcmZ^2))*qC'' + (Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+
+         CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CcmZ*CoZ*cos(qC)))*qB'' + (Ciyz*cos(qB+
+         qC)-Cixy*sin(qB+qC)-mC*(BoX*CcmY*sin(qB+qC)+CcmX*CcmZ*cos(qB+qC)+CcmY*
+         CoX*sin(qB+qC)-BoX*CcmZ*cos(qB+qC)-CcmX*CcmY*sin(qB+qC)-CcmZ*CoX*cos(
+         qB+qC)))*qA'' - TC - (sin(qB+qC)*(Cixz*sin(qB+qC)-Cizz*cos(qB+qC))-cos
+         (qB+qC)*(Cixz*cos(qB+qC)-Ciyy*sin(qB+qC)))*qA'^2 - mC*(BoZ*CcmY*sin(
+         qB+qC)*qA'^2+CcmZ*cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+
+         CcmY*sin(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)-BoZ*
+         CcmZ*cos(qB+qC)*qA'^2-CcmY*sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))
+         *qA'^2-CcmZ*cos(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)
+         -CcmY*cos(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)-CcmZ
+         *sin(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2))
+
+   (133) %Dynamics[4] = Dot(System.GetDynamics(Ao), Nx>)
+   (134) Dynamics[1] = Dot(System.GetDynamics(Ao), Ny>)
+-> (135) Dynamics[1] = mA*AcmY*g + mB*BoY*g + mC*BoY*g + mC*CcmY*g*sin(qB+qC)
+         + sin(qA)*(Aiyz*qA''+mA*AcmY*(AcmX*qA'^2-AcmZ*qA'')+mB*BoY*(BoX*qA'^2-
+         BoZ*qA'')+mC*BoY*(BoX*qA'^2-BoZ*qA'')+mC*BoY*(CoX*qA'^2+2*CoY*sin(qB)*
+         qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA'')-Aixy*qA'^2
+         -mB*BoY*(BcmY*cos(qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*cos
+         (qB)*qB')-BcmZ*sin(qB)*qA'')-mC*BoY*(qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(
+         qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos
+         (qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-
+         cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*
+         qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))) + sin(
+         qA)*sin(qB+qC)*(sin(qB+qC)*qA'*(Cixy*sin(qB+qC)*qA'-Cixx*(qB'+qC')-Ci
+         yz*cos(qB+qC)*qA')+Ciyz*(qB''+qC'')+mC*CcmY*(BoX*qA'^2-BoZ*qA'')+mC*
+         CcmY*(CoX*qA'^2+2*CoY*sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(
+         qB)-CoZ*sin(qB))*qA'')+mC*CcmX*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+
+         qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''
+         +qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+
+         cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-(qB'+qC')*(
+         Cixy*(qB'+qC')+Cixz*cos(qB+qC)*qA'-Ciyy*sin(qB+qC)*qA')-Cizz*(sin(qC)*
+         (cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*
+         qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-Cixz*(cos(qC)*(cos(qB)*qA'*qB'+cos(
+         qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos
+         (qB)*qA''))-mC*BoX*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos
+         (qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''+qC'')-CcmX*
+         (sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(
+         qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*CoX*((qB'+qC')*(CcmY*(
+         qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+
+         qC))*qA'^2-CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'
+         *qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*
+         qA'')))-mC*CcmY*(qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+
+         qC)*(qB'+qC'))+CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*
+         qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(
+         cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(
+         qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))) + cos(qA)*(mC*BoZ*CcmX*
+         qA'*(qB'+qC')+mC*BoY*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+qA'*(cos(
+         qB+qC)*(Cixy*(qB'+qC')+Cixz*cos(qB+qC)*qA'-Ciyy*sin(qB+qC)*qA')-sin(
+         qB+qC)*(Cixz*sin(qB+qC)*qA'-Ciyz*(qB'+qC')-Cizz*cos(qB+qC)*qA'))+Cixx*
+         (qB''+qC'')+mC*CcmX*CoZ*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')
+         +mC*CoY*sin(qC)*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(
+         qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''+qC''))+mC*
+         BoY*sin(qB+qC)*(CcmZ*(qB'+qC')^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(
+         qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin
+         (qB)*qA'*qC'-cos(qB)*qA'')))+mC*BoY*cos(qB+qC)*(CcmY*(qB'+qC')^2-CcmZ*
+         (qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA
+         '')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))+mC*BoZ*
+         sin(qB+qC)*(CcmY*(qB'+qC')^2-CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*
+         qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)
+         *qA'*qC'-cos(qB)*qA'')))-mC*CcmX*CoY*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+
+         sin(qB)*qA'')-Ciyz*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*
+         qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-Cixy*(
+         cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(
+         qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-mC*CoY*cos(qC)*((qB'+qC')*(
+         CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*
+         sin(qB+qC))*qA'^2+CcmY*(qB''+qC''))-mC*CoZ*sin(qC)*((qB'+qC')*(CcmZ*(
+         qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+
+         qC))*qA'^2+CcmY*(qB''+qC''))-mC*CoZ*cos(qC)*((qB'+qC')*(CcmY*(qB'+qC')
+         +CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2
+         -CcmZ*(qB''+qC''))-mC*BoZ*cos(qB+qC)*(CcmZ*(qB'+qC')^2+CcmY*(qB''+qC'')
+         +CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*
+         (sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*CcmZ*(CcmX*sin(qB+
+         qC)*qA'*(qB'+qC')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-
+         CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(
+         qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*
+         CcmY*(CcmX*cos(qB+qC)*qA'*(qB'+qC')-sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*
+         sin(qB+qC))*qA'^2-CcmY*(qB''+qC'')-CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(
+         qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos
+         (qB)*qA'')))) - Ty - mB*BcmY*g*sin(qB) - mB*BcmZ*g*cos(qB) - mC*CoY*g*sin(qB)
+         - mC*CoZ*g*cos(qB) - mC*CcmZ*g*cos(qB+qC) - cos(qA)*(mA*AcmY*(AcmZ*qA'^2
+         +AcmX*qA'')+mB*BoY*(BoZ*qA'^2+BoX*qA'')+mC*BoY*(BoZ*qA'^2+BoX*qA'')+
+         mC*CcmY*sin(qB+qC)*(BoZ*qA'^2+BoX*qA'')-Aiyz*qA'^2-Aixy*qA''-mB*BcmY*
+         sin(qB)*(BoZ*qA'^2+BoX*qA'')-mB*BcmZ*cos(qB)*(BoZ*qA'^2+BoX*qA'')-mC*
+         CoY*sin(qB)*(BoZ*qA'^2+BoX*qA'')-mC*CoZ*cos(qB)*(BoZ*qA'^2+BoX*qA'')-
+         mC*CcmZ*cos(qB+qC)*(BoZ*qA'^2+BoX*qA'')) - sin(qA)*sin(qB)*(qB'*(Bixy*
+         qB'-2*Bixz*cos(qB)*qA'-Biyy*sin(qB)*qA')+sin(qB)*qA'*(Bixx*qB'-Bixy*
+         sin(qB)*qA'-Biyz*cos(qB)*qA')+Biyz*qB''+mB*BcmY*(BoX*qA'^2-BoZ*qA'')+
+         mC*CoY*(BoX*qA'^2-BoZ*qA'')+Bizz*(sin(qB)*qA'*qB'-cos(qB)*qA'')+mC*Cc
+         mX*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos
+         (qB)*qA'')+mC*CoY*(CoX*qA'^2+2*CoY*sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*
+         qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA'')-Bixz*sin(qB)*qA''-mB*BcmX*(BcmY*qB'^2
+         +cos(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2+BcmZ*qB''+BcmX*cos(qB)*qA'')
+         -mB*BoX*(BcmY*qB'^2+cos(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2+BcmZ*qB
+         ''+BcmX*cos(qB)*qA'')-mC*BoX*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(
+         qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')-mC*CoX*(CoY*qB'^2+cos(qB)*(CoY*
+         cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')-mB*BcmY*(BcmY*
+         cos(qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*cos(qB)*qB')-BcmZ
+         *sin(qB)*qA'')-mC*CoY*(qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*
+         cos(qB+qC)*(qB'+qC'))+CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+
+         sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-
+         CcmZ*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(
+         sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))) - sin(qA)*cos(qB)*(
+         qB'*(Biyz*qB'-Bizz*cos(qB)*qA')+cos(qB)*qA'*(Bixx*qB'-Bixy*sin(qB)*qA'
+         -Biyz*cos(qB)*qA')+mB*BcmZ*(BoX*qA'^2-BoZ*qA'')+mC*CoZ*(BoX*qA'^2-BoZ*
+         qA'')+Biyy*(cos(qB)*qA'*qB'+sin(qB)*qA'')+mC*CcmX*(CoZ*qB'^2-sin(qB)*(
+         CoY*cos(qB)-CoZ*sin(qB))*qA'^2-CoY*qB''-CoX*sin(qB)*qA'')+mC*CoZ*(CoX*qA'^2
+         +2*CoY*sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))
+         *qA'')-Bixy*qB''-Bixz*(2*sin(qB)*qA'*qB'-cos(qB)*qA'')-mB*BcmX*(BcmZ*qB'^2
+         -sin(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2-BcmY*qB''-BcmX*sin(qB)*qA'')
+         -mB*BcmZ*(BcmY*cos(qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*
+         cos(qB)*qB')-BcmZ*sin(qB)*qA'')-mB*BoX*(BcmZ*qB'^2-sin(qB)*(BcmY*cos(
+         qB)-BcmZ*sin(qB))*qA'^2-BcmY*qB''-BcmX*sin(qB)*qA'')-mC*BoX*(CoZ*qB'^2
+         -sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2-CoY*qB''-CoX*sin(qB)*qA'')-
+         mC*CoX*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2-CoY*qB''-CoX
+         *sin(qB)*qA'')-mC*CoZ*(qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*
+         cos(qB+qC)*(qB'+qC'))+CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+
+         sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-
+         CcmZ*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(
+         sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))) - cos(qA)*(mB*BoY*(
+         BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2+mC*BoY*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         +mB*BcmX*BoY*qA''+mC*BoY*CoX*qA''+Bixy*sin(qB)*qA''+Biyz*cos(qB)*qA''+
+         mB*BoY*cos(qB)*(BcmY*qB'^2+BcmZ*qB'')+mB*BoZ*sin(qB)*(BcmY*qB'^2+BcmZ*
+         qB'')+mC*BoY*cos(qB)*(CoY*qB'^2+CoZ*qB'')+mC*BoZ*sin(qB)*(CoY*qB'^2+
+         CoZ*qB'')+mB*BoZ*cos(qB)*(BcmZ*qB'^2-BcmY*qB'')+mC*BoZ*cos(qB)*(CoZ*qB'^2
+         -CoY*qB'')+mC*CcmY*sin(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))
+         *qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')-(sin(qB)*(Bixz*sin(qB)+Bizz*cos(qB))
+         -cos(qB)*(Bixz*cos(qB)+Biyy*sin(qB)))*qA'^2-Bixx*qB''-mB*BoY*sin(qB)*(
+         BcmZ*qB'^2-BcmY*qB'')-mC*BoY*sin(qB)*(CoZ*qB'^2-CoY*qB'')-mB*BcmY*(sin
+         (qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2+BcmY*qB''+BcmX*sin(qB)*qA'')-
+         mB*BcmZ*(cos(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2+BcmZ*qB''+BcmX*cos(
+         qB)*qA'')-mC*CoY*(sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoY*qB''+CoX
+         *sin(qB)*qA'')-mC*CoZ*(cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB
+         ''+CoX*cos(qB)*qA'')-mC*CcmZ*cos(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-
+         CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')-mC*CcmY*cos(qC)*(CoZ*qB'^2
+         -sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2-CoY*qB''-CoX*sin(qB)*qA'')-
+         mC*CcmZ*sin(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2-CoY
+         *qB''-CoX*sin(qB)*qA'')) - sin(qA)*cos(qB+qC)*((qB'+qC')*(Cixz*sin(qB+
+         qC)*qA'-Ciyz*(qB'+qC')-Cizz*cos(qB+qC)*qA')+mC*CcmZ*(BoX*qA'^2-BoZ*qA
+         '')+mC*CcmZ*(CoX*qA'^2+2*CoY*sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(
+         CoY*cos(qB)-CoZ*sin(qB))*qA'')+Cixz*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*
+         qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)
+         *qA''))+Ciyy*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-
+         sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))+mC*CcmX*((qB'+
+         qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+
+         CcmZ*sin(qB+qC))*qA'^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*qA'*qB'
+         +cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*
+         qC'-cos(qB)*qA'')))-cos(qB+qC)*qA'*(Cixy*sin(qB+qC)*qA'-Cixx*(qB'+qC')
+         -Ciyz*cos(qB+qC)*qA')-Cixy*(qB''+qC'')-mC*BoX*((qB'+qC')*(CcmZ*(qB'+
+         qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))
+         *qA'^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'
+         +sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))
+         -mC*CoX*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(
+         CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*
+         (cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*
+         qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*CcmZ*(qA'*(CcmX*qA'+CcmY*sin(
+         qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+CcmY*(sin(qC)*(cos(qB)*qA'
+         *qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*
+         qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+
+         sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))))
+
+   (136) Dynamics[2] = Dot(System.GetDynamics(Ao), Nz>)
+-> (137) Dynamics[2] = sin(qA)*(mA*AcmY*(AcmZ*qA'^2+AcmX*qA'')+mB*BoY*(BoZ*qA'^2
+         +BoX*qA'')+mC*BoY*(BoZ*qA'^2+BoX*qA'')+mC*CcmY*sin(qB+qC)*(BoZ*qA'^2+
+         BoX*qA'')-Aiyz*qA'^2-Aixy*qA''-mB*BcmY*sin(qB)*(BoZ*qA'^2+BoX*qA'')-
+         mB*BcmZ*cos(qB)*(BoZ*qA'^2+BoX*qA'')-mC*CoY*sin(qB)*(BoZ*qA'^2+BoX*qA
+         '')-mC*CoZ*cos(qB)*(BoZ*qA'^2+BoX*qA'')-mC*CcmZ*cos(qB+qC)*(BoZ*qA'^2+
+         BoX*qA'')) + cos(qA)*(Aiyz*qA''+mA*AcmY*(AcmX*qA'^2-AcmZ*qA'')+mB*BoY*
+         (BoX*qA'^2-BoZ*qA'')+mC*BoY*(BoX*qA'^2-BoZ*qA'')+mC*BoY*(CoX*qA'^2+2*
+         CoY*sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))*
+         qA'')-Aixy*qA'^2-mB*BoY*(BcmY*cos(qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(
+         qB)*qB'+2*BcmZ*cos(qB)*qB')-BcmZ*sin(qB)*qA'')-mC*BoY*(qA'*(CcmX*qA'+
+         CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+CcmY*(sin(qC)*(
+         cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'
+         +sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)
+         *qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(
+         qB)*qA'')))) + sin(qA)*(mB*BoY*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2+mC*
+         BoY*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+mB*BcmX*BoY*qA''+mC*BoY*CoX*qA''+
+         Bixy*sin(qB)*qA''+Biyz*cos(qB)*qA''+mB*BoY*cos(qB)*(BcmY*qB'^2+BcmZ*
+         qB'')+mB*BoZ*sin(qB)*(BcmY*qB'^2+BcmZ*qB'')+mC*BoY*cos(qB)*(CoY*qB'^2+
+         CoZ*qB'')+mC*BoZ*sin(qB)*(CoY*qB'^2+CoZ*qB'')+mB*BoZ*cos(qB)*(BcmZ*qB'^2
+         -BcmY*qB'')+mC*BoZ*cos(qB)*(CoZ*qB'^2-CoY*qB'')+mC*CcmY*sin(qC)*(CoY*qB'^2
+         +cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')-(
+         sin(qB)*(Bixz*sin(qB)+Bizz*cos(qB))-cos(qB)*(Bixz*cos(qB)+Biyy*sin(qB)))
+         *qA'^2-Bixx*qB''-mB*BoY*sin(qB)*(BcmZ*qB'^2-BcmY*qB'')-mC*BoY*sin(qB)*
+         (CoZ*qB'^2-CoY*qB'')-mB*BcmY*(sin(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2
+         +BcmY*qB''+BcmX*sin(qB)*qA'')-mB*BcmZ*(cos(qB)*(BcmY*cos(qB)-BcmZ*sin(
+         qB))*qA'^2+BcmZ*qB''+BcmX*cos(qB)*qA'')-mC*CoY*(sin(qB)*(CoY*cos(qB)-
+         CoZ*sin(qB))*qA'^2+CoY*qB''+CoX*sin(qB)*qA'')-mC*CoZ*(cos(qB)*(CoY*cos
+         (qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')-mC*CcmZ*cos(qC)*(
+         CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)
+         *qA'')-mC*CcmY*cos(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         -CoY*qB''-CoX*sin(qB)*qA'')-mC*CcmZ*sin(qC)*(CoZ*qB'^2-sin(qB)*(CoY*
+         cos(qB)-CoZ*sin(qB))*qA'^2-CoY*qB''-CoX*sin(qB)*qA'')) + cos(qA)*sin(
+         qB+qC)*(sin(qB+qC)*qA'*(Cixy*sin(qB+qC)*qA'-Cixx*(qB'+qC')-Ciyz*cos(
+         qB+qC)*qA')+Ciyz*(qB''+qC'')+mC*CcmY*(BoX*qA'^2-BoZ*qA'')+mC*CcmY*(CoX
+         *qA'^2+2*CoY*sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*
+         sin(qB))*qA'')+mC*CcmX*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')
+         +cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''+qC'')-
+         CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(
+         sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-(qB'+qC')*(Cixy*(qB'+
+         qC')+Cixz*cos(qB+qC)*qA'-Ciyy*sin(qB+qC)*qA')-Cizz*(sin(qC)*(cos(qB)*
+         qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)
+         *qA'*qC'-cos(qB)*qA''))-Cixz*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'
+         +sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))
+         -mC*BoX*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(
+         CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''+qC'')-CcmX*(sin(qC)*
+         (cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*
+         qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*CoX*((qB'+qC')*(CcmY*(qB'+qC')+
+         CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2
+         -CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(
+         qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*
+         CcmY*(qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))
+         +CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*
+         (sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)
+         *qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(
+         qB)*qA'*qC'-cos(qB)*qA'')))) - Tz - sin(qB)*cos(qA)*(qB'*(Bixy*qB'-2*
+         Bixz*cos(qB)*qA'-Biyy*sin(qB)*qA')+sin(qB)*qA'*(Bixx*qB'-Bixy*sin(qB)*
+         qA'-Biyz*cos(qB)*qA')+Biyz*qB''+mB*BcmY*(BoX*qA'^2-BoZ*qA'')+mC*CoY*(
+         BoX*qA'^2-BoZ*qA'')+Bizz*(sin(qB)*qA'*qB'-cos(qB)*qA'')+mC*CcmX*(CoY*qB'^2
+         +cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')+
+         mC*CoY*(CoX*qA'^2+2*CoY*sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos
+         (qB)-CoZ*sin(qB))*qA'')-Bixz*sin(qB)*qA''-mB*BcmX*(BcmY*qB'^2+cos(qB)*
+         (BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2+BcmZ*qB''+BcmX*cos(qB)*qA'')-mB*BoX*
+         (BcmY*qB'^2+cos(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2+BcmZ*qB''+BcmX*
+         cos(qB)*qA'')-mC*BoX*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         +CoZ*qB''+CoX*cos(qB)*qA'')-mC*CoX*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ
+         *sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')-mB*BcmY*(BcmY*cos(qB)*qA''-
+         qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*cos(qB)*qB')-BcmZ*sin(qB)*qA'')
+         -mC*CoY*(qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+
+         qC'))+CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos
+         (qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(
+         cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'
+         +sin(qB)*qA'*qC'-cos(qB)*qA'')))) - cos(qA)*cos(qB)*(qB'*(Biyz*qB'-Bi
+         zz*cos(qB)*qA')+cos(qB)*qA'*(Bixx*qB'-Bixy*sin(qB)*qA'-Biyz*cos(qB)*
+         qA')+mB*BcmZ*(BoX*qA'^2-BoZ*qA'')+mC*CoZ*(BoX*qA'^2-BoZ*qA'')+Biyy*(
+         cos(qB)*qA'*qB'+sin(qB)*qA'')+mC*CcmX*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-
+         CoZ*sin(qB))*qA'^2-CoY*qB''-CoX*sin(qB)*qA'')+mC*CoZ*(CoX*qA'^2+2*CoY*
+         sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA'')-
+         Bixy*qB''-Bixz*(2*sin(qB)*qA'*qB'-cos(qB)*qA'')-mB*BcmX*(BcmZ*qB'^2-
+         sin(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2-BcmY*qB''-BcmX*sin(qB)*qA'')
+         -mB*BcmZ*(BcmY*cos(qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*
+         cos(qB)*qB')-BcmZ*sin(qB)*qA'')-mB*BoX*(BcmZ*qB'^2-sin(qB)*(BcmY*cos(
+         qB)-BcmZ*sin(qB))*qA'^2-BcmY*qB''-BcmX*sin(qB)*qA'')-mC*BoX*(CoZ*qB'^2
+         -sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2-CoY*qB''-CoX*sin(qB)*qA'')-
+         mC*CoX*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2-CoY*qB''-CoX
+         *sin(qB)*qA'')-mC*CoZ*(qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*
+         cos(qB+qC)*(qB'+qC'))+CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+
+         sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-
+         CcmZ*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(
+         sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))) - cos(qA)*cos(qB+qC)*
+         ((qB'+qC')*(Cixz*sin(qB+qC)*qA'-Ciyz*(qB'+qC')-Cizz*cos(qB+qC)*qA')+
+         mC*CcmZ*(BoX*qA'^2-BoZ*qA'')+mC*CcmZ*(CoX*qA'^2+2*CoY*sin(qB)*qA'*qB'+
+         2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA'')+Cixz*(sin(qC)*(
+         cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'
+         +sin(qB)*qA'*qC'-cos(qB)*qA''))+Ciyy*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)
+         *qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(
+         qB)*qA''))+mC*CcmX*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin
+         (qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+CcmY*(qB''+qC'')+CcmX*
+         (cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(
+         qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-cos(qB+qC)*qA'*(Cixy*sin(
+         qB+qC)*qA'-Cixx*(qB'+qC')-Ciyz*cos(qB+qC)*qA')-Cixy*(qB''+qC'')-mC*BoX
+         *((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(
+         qB+qC)+CcmZ*sin(qB+qC))*qA'^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*
+         qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)
+         *qA'*qC'-cos(qB)*qA'')))-mC*CoX*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(
+         qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+CcmY*(
+         qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')
+         -sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*CcmZ*(qA'
+         *(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+CcmY*(
+         sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(
+         qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*qA'*
+         qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'
+         *qC'-cos(qB)*qA'')))) - sin(qA)*(mC*BoZ*CcmX*qA'*(qB'+qC')+mC*BoY*(Cc
+         mY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+qA'*(cos(qB+qC)*(Cixy*(qB'+qC')+
+         Cixz*cos(qB+qC)*qA'-Ciyy*sin(qB+qC)*qA')-sin(qB+qC)*(Cixz*sin(qB+qC)*
+         qA'-Ciyz*(qB'+qC')-Cizz*cos(qB+qC)*qA'))+Cixx*(qB''+qC'')+mC*CcmX*CoZ*
+         (sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')+mC*CoY*sin(qC)*((qB'+
+         qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+
+         CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''+qC''))+mC*BoY*sin(qB+qC)*(CcmZ*(qB'+
+         qC')^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'
+         +sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))
+         +mC*BoY*cos(qB+qC)*(CcmY*(qB'+qC')^2-CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(
+         cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'
+         +sin(qB)*qA'*qC'-cos(qB)*qA'')))+mC*BoZ*sin(qB+qC)*(CcmY*(qB'+qC')^2-
+         CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(
+         qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*
+         CcmX*CoY*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-Ciyz*(sin(qC)*
+         (cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*
+         qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-Cixy*(cos(qC)*(cos(qB)*qA'*qB'+cos(
+         qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos
+         (qB)*qA''))-mC*CoY*cos(qC)*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*
+         qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+CcmY*(qB''+qC
+         ''))-mC*CoZ*sin(qC)*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+
+         sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+CcmY*(qB''+qC''))-
+         mC*CoZ*cos(qC)*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+
+         qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''+qC''))-mC*BoZ*
+         cos(qB+qC)*(CcmZ*(qB'+qC')^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*
+         qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)
+         *qA'*qC'-cos(qB)*qA'')))-mC*CcmZ*(CcmX*sin(qB+qC)*qA'*(qB'+qC')+cos(
+         qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''+qC'')-CcmX*(
+         sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(
+         qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*CcmY*(CcmX*cos(qB+qC)*
+         qA'*(qB'+qC')-sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmY*
+         (qB''+qC'')-CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA
+         '')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))))
+
+   (138) Dynamics[3] = Dot(System.GetDynamics(), Nx>)
+-> (139) Dynamics[3] = mC*CcmX*qA'*(qB'+qC') + mC*sin(qB+qC)*(CcmY*(qB'+qC')^2-
+         CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(
+         qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))
+         - Fx - sin(qB)*(mB*(BcmY*qB'^2+BcmZ*qB'')+mC*(CoY*qB'^2+CoZ*qB''))
+         - cos(qB)*(mB*(BcmZ*qB'^2-BcmY*qB'')+mC*(CoZ*qB'^2-CoY*qB'')) - mC*cos
+         (qB+qC)*(CcmZ*(qB'+qC')^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*qA'*
+         qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'
+         *qC'-cos(qB)*qA'')))
+
+   (140) Dynamics[4] = Dot(System.GetDynamics(), Ny>)
+-> (141) Dynamics[4] = mC*sin(qA)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2
+         + sin(qA)*sin(qB)*(mB*(BcmZ*qB'^2-BcmY*qB'')+mC*(CoZ*qB'^2-CoY*qB''))
+         + mC*sin(qA)*sin(qB+qC)*(CcmZ*(qB'+qC')^2+CcmY*(qB''+qC'')+CcmX*(cos(
+         qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*
+         qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))) + mC*sin(qA)*cos(qB+qC)*(CcmY*
+         (qB'+qC')^2-CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*
+         qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)
+         *qA''))) + cos(qA)*(mB*(BcmY*cos(qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(qB)
+         *qB'+2*BcmZ*cos(qB)*qB')-BcmZ*sin(qB)*qA'')-mC*(CoX*qA'^2+2*CoY*sin(
+         qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA''))
+         + mC*cos(qA)*(qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*
+         (qB'+qC'))+CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')
+         +cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)
+         *(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*
+         qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))) - Fy - mB*sin(qA)*(BcmY*cos(qB)-
+         BcmZ*sin(qB))*qA'^2 - mC*sin(qA)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         - mB*BcmX*sin(qA)*qA'' - mC*CoX*sin(qA)*qA'' - sin(qA)*cos(qB)*(mB*(
+         BcmY*qB'^2+BcmZ*qB'')+mC*(CoY*qB'^2+CoZ*qB'')) - sin(qA)*(mA*(AcmZ*qA'^2
+         +AcmX*qA'')+mB*(BoZ*qA'^2+BoX*qA'')+mC*(BoZ*qA'^2+BoX*qA'')) - cos(qA)
+         *(mA*(AcmX*qA'^2-AcmZ*qA'')+mB*(BoX*qA'^2-BoZ*qA'')+mC*(BoX*qA'^2-BoZ*
+         qA''))
+
+   (142) Dynamics[5] = Dot(System.GetDynamics(), Nz>)
+-> (143) Dynamics[5] = mA*g + mB*g + mC*g + mC*cos(qA)*(CcmY*cos(qB+qC)+CcmZ*
+         sin(qB+qC))*qA'^2 + sin(qB)*cos(qA)*(mB*(BcmZ*qB'^2-BcmY*qB'')+mC*(CoZ
+         *qB'^2-CoY*qB'')) + sin(qA)*(mA*(AcmX*qA'^2-AcmZ*qA'')+mB*(BoX*qA'^2-
+         BoZ*qA'')+mC*(BoX*qA'^2-BoZ*qA'')) + mC*cos(qA)*sin(qB+qC)*(CcmZ*(qB'+
+         qC')^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'
+         +sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))
+         + mC*cos(qA)*cos(qB+qC)*(CcmY*(qB'+qC')^2-CcmZ*(qB''+qC'')-CcmX*(sin(
+         qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*
+         qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))) - Fz - mB*cos(qA)*(BcmY*cos(
+         qB)-BcmZ*sin(qB))*qA'^2 - mC*cos(qA)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         - mB*BcmX*cos(qA)*qA'' - mC*CoX*cos(qA)*qA'' - cos(qA)*cos(qB)*(mB*(
+         BcmY*qB'^2+BcmZ*qB'')+mC*(CoY*qB'^2+CoZ*qB'')) - cos(qA)*(mA*(AcmZ*qA'^2
+         +AcmX*qA'')+mB*(BoZ*qA'^2+BoX*qA'')+mC*(BoZ*qA'^2+BoX*qA'')) - sin(qA)
+         *(mB*(BcmY*cos(qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*cos(
+         qB)*qB')-BcmZ*sin(qB)*qA'')-mC*(CoX*qA'^2+2*CoY*sin(qB)*qA'*qB'+2*CoZ*
+         cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA'')) - mC*sin(qA)*(qA'*(
+         CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+CcmY*(
+         sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(
+         qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*qA'*
+         qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'
+         *qC'-cos(qB)*qA'')))
+
+   (144) %-------------------------------------------- 
+   (145) % Position Check
+   (146) footPos> = foot.GetPosition( No )
+-> (147) footPos> = BoX*Ax> + BoY*Ay> + BoZ*Az> + CoX*Bx> + CoY*By> + CoZ*Bz>
+         + footX*Cx> + footY*Cy> + footZ*Cz>
+
+   (148) %-------------------------------------------- 
+   (149) % Solve
+   (150) Tx = -TA
+-> (151) Tx = -TA
+
+   (152) Solve( Motors = 0, qA'', qB'', qC'')
+-> (153) qA'' = (((Bixx+Cixx+mB*(BcmY^2+BcmZ^2)-mC*(2*CcmY*CoY*cos(qC)+2*CcmY*
+         CoZ*sin(qC)+2*CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CoY^2-CoZ^2-2*CcmZ*CoZ*
+         cos(qC)))*(Cixy*sin(qB+qC)-Ciyz*cos(qB+qC)-mC*(BoX*CcmZ*cos(qB+qC)+Cc
+         mZ*CoX*cos(qB)*cos(qC)-CcmX*CcmZ*cos(qB+qC)-CcmY*CoX*sin(qC)*cos(qB)-
+         CcmY*(BoX-CcmX)*sin(qB+qC)-CoX*sin(qB)*(CcmY*cos(qC)+CcmZ*sin(qC))))+(
+         Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2
+         -CcmZ*CoZ*cos(qC)))*(Ciyz*cos(qB+qC)+mB*(BcmX*BcmZ*cos(qB)+BcmZ*BoX*
+         cos(qB)+BcmY*(BcmX+BoX)*sin(qB))-Bixy*sin(qB)-Biyz*cos(qB)-Cixy*sin(
+         qB+qC)-mC*(CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qC)*cos(qB)+CcmX*CoZ*cos(
+         qC)*cos(qB+qC)-BoX*CoZ*cos(qB)-CoX*CoZ*cos(qB)-BoX*CcmZ*cos(qB+qC)-Cc
+         mZ*CoX*cos(qB)*cos(qC)-CcmX*CoY*sin(qC)*cos(qB+qC)-sin(qB)*(BoX*CoY+
+         CoX*CoY-CcmY*CoX*cos(qC)-CcmZ*CoX*sin(qC))-sin(qB+qC)*(CcmX*CcmY-BoX*
+         CcmY-CcmX*CoY*cos(qC)-CcmX*CoZ*sin(qC)))))*(mC*g*cos(qA)*(CcmY*sin(qB+
+         qC)-CcmZ*cos(qB+qC))-TC-(sin(qB+qC)*(Cixz*sin(qB+qC)-Cizz*cos(qB+qC))-
+         cos(qB+qC)*(Cixz*cos(qB+qC)-Ciyy*sin(qB+qC)))*qA'^2-mC*(BoZ*CcmY*sin(
+         qB+qC)*qA'^2+CcmZ*cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+
+         CcmY*sin(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)-BoZ*
+         CcmZ*cos(qB+qC)*qA'^2-CcmY*sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))
+         *qA'^2-CcmZ*cos(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)
+         -CcmY*cos(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)-CcmZ
+         *sin(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)))+((Cixx-
+         mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-
+         CcmZ*CoZ*cos(qC)))*(Cixy*sin(qB+qC)-Ciyz*cos(qB+qC)-mC*(BoX*CcmZ*cos(
+         qB+qC)+CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CcmZ*cos(qB+qC)-CcmY*CoX*sin(qC)*
+         cos(qB)-CcmY*(BoX-CcmX)*sin(qB+qC)-CoX*sin(qB)*(CcmY*cos(qC)+CcmZ*sin(
+         qC))))+(Cixx+mC*(CcmY^2+CcmZ^2))*(Ciyz*cos(qB+qC)+mB*(BcmX*BcmZ*cos(
+         qB)+BcmZ*BoX*cos(qB)+BcmY*(BcmX+BoX)*sin(qB))-Bixy*sin(qB)-Biyz*cos(
+         qB)-Cixy*sin(qB+qC)-mC*(CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qC)*cos(qB)+
+         CcmX*CoZ*cos(qC)*cos(qB+qC)-BoX*CoZ*cos(qB)-CoX*CoZ*cos(qB)-BoX*CcmZ*
+         cos(qB+qC)-CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CoY*sin(qC)*cos(qB+qC)-sin(
+         qB)*(BoX*CoY+CoX*CoY-CcmY*CoX*cos(qC)-CcmZ*CoX*sin(qC))-sin(qB+qC)*(
+         CcmX*CcmY-BoX*CcmY-CcmX*CoY*cos(qC)-CcmX*CoZ*sin(qC)))))*(TB+mB*g*cos(
+         qA)*(BcmY*sin(qB)+BcmZ*cos(qB))+(sin(qB+qC)*(Cixz*sin(qB+qC)-Cizz*cos(
+         qB+qC))-cos(qB+qC)*(Cixz*cos(qB+qC)-Ciyy*sin(qB+qC)))*qA'^2-mC*g*cos(
+         qA)*(CcmY*sin(qB+qC)-CoY*sin(qB)-CoZ*cos(qB)-CcmZ*cos(qB+qC))-(sin(qB)
+         *(Bixz*sin(qB)+Bizz*cos(qB))-cos(qB)*(Bixz*cos(qB)+Biyy*sin(qB)))*qA'^2
+         -mB*(BcmY*BoZ*sin(qB)+BcmZ*BoZ*cos(qB)+BcmY*sin(qB)*(BcmY*cos(qB)-BcmZ
+         *sin(qB))+BcmZ*cos(qB)*(BcmY*cos(qB)-BcmZ*sin(qB)))*qA'^2-mC*(BoZ*CoY*
+         sin(qB)*qA'^2+BoZ*CoZ*cos(qB)*qA'^2+BoZ*CcmZ*cos(qB+qC)*qA'^2+CcmX*CoZ
+         *sin(qB)*qA'*(qB'+qC')+CoY*sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoZ
+         *cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CcmY*sin(qB+qC)*(CcmY*cos(qB+
+         qC)+CcmZ*sin(qB+qC))*qA'^2+CcmZ*cos(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(
+         qB)-CoZ*sin(qB))*qA'^2)+CcmY*cos(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-
+         CoZ*sin(qB))*qA'^2)+CcmZ*sin(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*
+         sin(qB))*qA'^2)+CoY*sin(qC)*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)
+         *qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)-BoZ*CcmY*sin
+         (qB+qC)*qA'^2-CcmX*CoY*cos(qB)*qA'*(qB'+qC')-CcmZ*cos(qB+qC)*(CcmY*cos
+         (qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmY*sin(qC)*(CoY*qB'^2+cos(qB)*(CoY*
+         cos(qB)-CoZ*sin(qB))*qA'^2)-CoZ*cos(qC)*((qB'+qC')*(CcmY*(qB'+qC')+Cc
+         mX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)
+         -CoY*cos(qC)*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+
+         qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)-CoZ*sin(qC)*((qB'+qC')*(
+         CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*
+         sin(qB+qC))*qA'^2)))-((Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+CcmZ
+         *CoY*sin(qC)-CcmY^2-CcmZ^2-CcmZ*CoZ*cos(qC)))^2-(Cixx+mC*(CcmY^2+CcmZ^2))
+         *(Bixx+Cixx+mB*(BcmY^2+BcmZ^2)-mC*(2*CcmY*CoY*cos(qC)+2*CcmY*CoZ*sin(
+         qC)+2*CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CoY^2-CoZ^2-2*CcmZ*CoZ*cos(qC))))
+         *(2*Bixz*cos(qB)^2*qA'*qB'+2*Biyy*sin(qB)*cos(qB)*qA'*qB'+sin(qB)*qB'*
+         (Biyz*qB'-2*Bixz*sin(qB)*qA'-2*Bizz*cos(qB)*qA')+sin(qB+qC)*(qB'+qC')*
+         (2*Ciyy*cos(qB+qC)*qA'+3*Cixz*sin(qB+qC)*qA'-Ciyz*(qB'+qC')-2*Cizz*cos
+         (qB+qC)*qA')+mB*(BcmX*cos(qB)*(BcmY*qB'^2+cos(qB)*(BcmY*cos(qB)-BcmZ*
+         sin(qB))*qA'^2)+BoX*cos(qB)*(BcmY*qB'^2+cos(qB)*(BcmY*cos(qB)-BcmZ*sin
+         (qB))*qA'^2)-2*BoZ*(BcmY*sin(qB)+BcmZ*cos(qB))*qA'*qB'-BoX*(BcmY*cos(
+         qB)-BcmZ*sin(qB))*qA'^2-(BcmX+BoX)*sin(qB)*(BcmZ*qB'^2-sin(qB)*(BcmY*
+         cos(qB)-BcmZ*sin(qB))*qA'^2)-(BcmY*cos(qB)-BcmZ*sin(qB))*qA'*(BcmX*qA'
+         +2*BcmY*sin(qB)*qB'+2*BcmZ*cos(qB)*qB'))-TA-mA*g*(AcmX*cos(qA)+AcmZ*
+         sin(qA))-mB*g*(BcmX*cos(qA)+BoX*cos(qA)+BoZ*sin(qA)+sin(qA)*(BcmY*cos(
+         qB)-BcmZ*sin(qB)))-mC*g*(BoX*cos(qA)+BoZ*sin(qA)+CoX*cos(qA)+sin(qA)*(
+         CoY*cos(qB)-CoZ*sin(qB))-CcmX*cos(qA)-sin(qA)*(CcmY*cos(qB+qC)+CcmZ*
+         sin(qB+qC)))-Cixz*qA'*(qB'+qC')-Bixy*cos(qB)*qB'^2-cos(qB+qC)*(qB'+qC')
+         *(Cixy*(qB'+qC')+Cixz*cos(qB+qC)*qA')-mC*(BoX*CcmY*cos(qB+qC)*(qB'+qC')^2
+         +2*BoZ*(CoY*sin(qB)+CoZ*cos(qB))*qA'*qB'+2*(CoY*sin(qB)+CoZ*cos(qB))*(
+         CoY*cos(qB)-CoZ*sin(qB))*qA'*qB'+CcmX*cos(qC)*cos(qB+qC)*(CoY*qB'^2+
+         cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)+CcmX*sin(qC)*cos(qB+qC)*(CoZ*qB'^2
+         -sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)+2*(CcmY*cos(qB+qC)+CcmZ*sin(
+         qB+qC))*(CcmY*sin(qB+qC)-CcmZ*cos(qB+qC))*qA'*(qB'+qC')+CoX*cos(qB)*
+         cos(qC)*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(
+         CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)+CoX*sin(qC)*cos(qB)*((qB'+qC')
+         *(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ
+         *sin(qB+qC))*qA'^2)+sin(qB+qC)*(BoX*CcmZ*(qB'+qC')^2+CcmX*sin(qC)*(CoY
+         *qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)-CcmX*CcmZ*(qB'+qC')^2-
+         CcmX*cos(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2))-BoX*
+         CoY*cos(qB)*qB'^2-CoX*CoY*cos(qB)*qB'^2-CcmX*CcmY*cos(qB+qC)*(qB'+qC')^2
+         -2*BoZ*(CcmY*sin(qB+qC)-CcmZ*cos(qB+qC))*qA'*(qB'+qC')-(CcmY*cos(qB+
+         qC)+CcmZ*sin(qB+qC))*qA'*(CoX*qA'+2*CoY*sin(qB)*qB'+2*CoZ*cos(qB)*qB')
+         -(CoY*cos(qB)-CoZ*sin(qB))*qA'*(CcmX*qA'+2*CcmY*sin(qB+qC)*(qB'+qC')-2
+         *CcmZ*cos(qB+qC)*(qB'+qC'))-sin(qB)*(CoX*sin(qC)*((qB'+qC')*(CcmY*(qB'
+         +qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))
+         *qA'^2)-BoX*CoZ*qB'^2-CoX*CoZ*qB'^2-CoX*cos(qC)*((qB'+qC')*(CcmZ*(qB'+
+         qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))
+         *qA'^2)))))/((Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+CcmZ*CoY*sin(
+         qC)-CcmY^2-CcmZ^2-CcmZ*CoZ*cos(qC)))*((Cixy*sin(qB+qC)-Ciyz*cos(qB+qC)
+         -mC*(BoX*CcmZ*cos(qB+qC)+CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CcmZ*cos(qB+qC)
+         -CcmY*CoX*sin(qC)*cos(qB)-CcmY*(BoX-CcmX)*sin(qB+qC)-CoX*sin(qB)*(CcmY
+         *cos(qC)+CcmZ*sin(qC))))*(Ciyz*cos(qB+qC)+mB*(BcmX*BcmY*sin(qB)+BcmX*
+         BcmZ*cos(qB)+BcmY*BoX*sin(qB)+BcmZ*BoX*cos(qB))-Bixy*sin(qB)-Biyz*cos(
+         qB)-Cixy*sin(qB+qC)-mC*(CcmX*CoY*sin(qB)+CcmX*CoZ*cos(qB)+BoX*CcmY*sin
+         (qB+qC)+CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qB+qC)-BoX*CoY*sin(qB)-BoX*
+         CoZ*cos(qB)-CoX*CoY*sin(qB)-CoX*CoZ*cos(qB)-BoX*CcmZ*cos(qB+qC)-CcmX*
+         CcmY*sin(qB+qC)-CcmZ*CoX*cos(qB+qC)))+(Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*
+         CoZ*sin(qC)+CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CcmZ*CoZ*cos(qC)))*(Aiyy+
+         Bizz+Cizz+mA*(AcmX^2+AcmZ^2)+sin(qB)*(Biyy*sin(qB)+2*Bixz*cos(qB)-Bizz
+         *sin(qB))+sin(qB+qC)*(Ciyy*sin(qB+qC)-2*Cixz*cos(qB+qC)-Cizz*sin(qB+
+         qC))+mB*(BcmX^2+BoX^2+BoZ^2+2*BcmX*BoX+(BcmY*cos(qB)-BcmZ*sin(qB))^2+2
+         *BoZ*(BcmY*cos(qB)-BcmZ*sin(qB)))+mC*(BoX^2+BoZ^2+CcmX^2+CoX^2+2*BoX*
+         CoX+(CoY*cos(qB)-CoZ*sin(qB))^2+(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))^2+2*
+         BoZ*(CoY*cos(qB)-CoZ*sin(qB))-2*BoX*CcmX-2*CcmX*CoX-2*BoZ*(CcmY*cos(
+         qB+qC)+CcmZ*sin(qB+qC))-2*(CoY*cos(qB)-CoZ*sin(qB))*(CcmY*cos(qB+qC)+
+         CcmZ*sin(qB+qC)))))-(Ciyz*cos(qB+qC)-Cixy*sin(qB+qC)-mC*(BoX*CcmY*sin(
+         qB+qC)+CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qB+qC)-BoX*CcmZ*cos(qB+qC)-
+         CcmX*CcmY*sin(qB+qC)-CcmZ*CoX*cos(qB+qC)))*((Bixx+Cixx+mB*(BcmY^2+BcmZ^2)
+         -mC*(2*CcmY*CoY*cos(qC)+2*CcmY*CoZ*sin(qC)+2*CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2
+         -CoY^2-CoZ^2-2*CcmZ*CoZ*cos(qC)))*(Cixy*sin(qB+qC)-Ciyz*cos(qB+qC)-mC*
+         (BoX*CcmZ*cos(qB+qC)+CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CcmZ*cos(qB+qC)-Cc
+         mY*CoX*sin(qC)*cos(qB)-CcmY*(BoX-CcmX)*sin(qB+qC)-CoX*sin(qB)*(CcmY*
+         cos(qC)+CcmZ*sin(qC))))+(Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+
+         CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CcmZ*CoZ*cos(qC)))*(Ciyz*cos(qB+qC)+mB*
+         (BcmX*BcmZ*cos(qB)+BcmZ*BoX*cos(qB)+BcmY*(BcmX+BoX)*sin(qB))-Bixy*sin(
+         qB)-Biyz*cos(qB)-Cixy*sin(qB+qC)-mC*(CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin
+         (qC)*cos(qB)+CcmX*CoZ*cos(qC)*cos(qB+qC)-BoX*CoZ*cos(qB)-CoX*CoZ*cos(
+         qB)-BoX*CcmZ*cos(qB+qC)-CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CoY*sin(qC)*cos(
+         qB+qC)-sin(qB)*(BoX*CoY+CoX*CoY-CcmY*CoX*cos(qC)-CcmZ*CoX*sin(qC))-sin
+         (qB+qC)*(CcmX*CcmY-BoX*CcmY-CcmX*CoY*cos(qC)-CcmX*CoZ*sin(qC)))))-(Ci
+         xx+mC*(CcmY^2+CcmZ^2))*((Bixx+Cixx+mB*(BcmY^2+BcmZ^2)-mC*(2*CcmY*CoY*
+         cos(qC)+2*CcmY*CoZ*sin(qC)+2*CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CoY^2-CoZ^2
+         -2*CcmZ*CoZ*cos(qC)))*(Aiyy+Bizz+Cizz+mA*(AcmX^2+AcmZ^2)+sin(qB)*(Biyy
+         *sin(qB)+2*Bixz*cos(qB)-Bizz*sin(qB))+sin(qB+qC)*(Ciyy*sin(qB+qC)-2*
+         Cixz*cos(qB+qC)-Cizz*sin(qB+qC))+mB*(BcmX^2+BoX^2+BoZ^2+2*BcmX*BoX+(
+         BcmY*cos(qB)-BcmZ*sin(qB))^2+2*BoZ*(BcmY*cos(qB)-BcmZ*sin(qB)))+mC*(BoX^2
+         +BoZ^2+CcmX^2+CoX^2+2*BoX*CoX+(CoY*cos(qB)-CoZ*sin(qB))^2+(CcmY*cos(
+         qB+qC)+CcmZ*sin(qB+qC))^2+2*BoZ*(CoY*cos(qB)-CoZ*sin(qB))-2*BoX*CcmX-2
+         *CcmX*CoX-2*BoZ*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))-2*(CoY*cos(qB)-CoZ*
+         sin(qB))*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))))-(Ciyz*cos(qB+qC)+mB*(BcmX
+         *BcmY*sin(qB)+BcmX*BcmZ*cos(qB)+BcmY*BoX*sin(qB)+BcmZ*BoX*cos(qB))-Bi
+         xy*sin(qB)-Biyz*cos(qB)-Cixy*sin(qB+qC)-mC*(CcmX*CoY*sin(qB)+CcmX*CoZ*
+         cos(qB)+BoX*CcmY*sin(qB+qC)+CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qB+qC)-
+         BoX*CoY*sin(qB)-BoX*CoZ*cos(qB)-CoX*CoY*sin(qB)-CoX*CoZ*cos(qB)-BoX*
+         CcmZ*cos(qB+qC)-CcmX*CcmY*sin(qB+qC)-CcmZ*CoX*cos(qB+qC)))*(Ciyz*cos(
+         qB+qC)+mB*(BcmX*BcmZ*cos(qB)+BcmZ*BoX*cos(qB)+BcmY*(BcmX+BoX)*sin(qB))
+         -Bixy*sin(qB)-Biyz*cos(qB)-Cixy*sin(qB+qC)-mC*(CcmX*CcmZ*cos(qB+qC)+
+         CcmY*CoX*sin(qC)*cos(qB)+CcmX*CoZ*cos(qC)*cos(qB+qC)-BoX*CoZ*cos(qB)-
+         CoX*CoZ*cos(qB)-BoX*CcmZ*cos(qB+qC)-CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CoY*
+         sin(qC)*cos(qB+qC)-sin(qB)*(BoX*CoY+CoX*CoY-CcmY*CoX*cos(qC)-CcmZ*CoX*
+         sin(qC))-sin(qB+qC)*(CcmX*CcmY-BoX*CcmY-CcmX*CoY*cos(qC)-CcmX*CoZ*sin(
+         qC))))))
+
+-> (154) qB'' = -(((Cixy*sin(qB+qC)-Ciyz*cos(qB+qC)-mC*(BoX*CcmZ*cos(qB+qC)+Cc
+         mZ*CoX*cos(qB)*cos(qC)-CcmX*CcmZ*cos(qB+qC)-CcmY*CoX*sin(qC)*cos(qB)-
+         CcmY*(BoX-CcmX)*sin(qB+qC)-CoX*sin(qB)*(CcmY*cos(qC)+CcmZ*sin(qC))))*(
+         Ciyz*cos(qB+qC)+mB*(BcmX*BcmY*sin(qB)+BcmX*BcmZ*cos(qB)+BcmY*BoX*sin(
+         qB)+BcmZ*BoX*cos(qB))-Bixy*sin(qB)-Biyz*cos(qB)-Cixy*sin(qB+qC)-mC*(
+         CcmX*CoY*sin(qB)+CcmX*CoZ*cos(qB)+BoX*CcmY*sin(qB+qC)+CcmX*CcmZ*cos(
+         qB+qC)+CcmY*CoX*sin(qB+qC)-BoX*CoY*sin(qB)-BoX*CoZ*cos(qB)-CoX*CoY*sin
+         (qB)-CoX*CoZ*cos(qB)-BoX*CcmZ*cos(qB+qC)-CcmX*CcmY*sin(qB+qC)-CcmZ*CoX
+         *cos(qB+qC)))+(Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+CcmZ*CoY*sin
+         (qC)-CcmY^2-CcmZ^2-CcmZ*CoZ*cos(qC)))*(Aiyy+Bizz+Cizz+mA*(AcmX^2+AcmZ^2)
+         +sin(qB)*(Biyy*sin(qB)+2*Bixz*cos(qB)-Bizz*sin(qB))+sin(qB+qC)*(Ciyy*
+         sin(qB+qC)-2*Cixz*cos(qB+qC)-Cizz*sin(qB+qC))+mB*(BcmX^2+BoX^2+BoZ^2+2
+         *BcmX*BoX+(BcmY*cos(qB)-BcmZ*sin(qB))^2+2*BoZ*(BcmY*cos(qB)-BcmZ*sin(
+         qB)))+mC*(BoX^2+BoZ^2+CcmX^2+CoX^2+2*BoX*CoX+(CoY*cos(qB)-CoZ*sin(qB))^2
+         +(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))^2+2*BoZ*(CoY*cos(qB)-CoZ*sin(qB))-2
+         *BoX*CcmX-2*CcmX*CoX-2*BoZ*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))-2*(CoY*
+         cos(qB)-CoZ*sin(qB))*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC)))))*(mC*g*cos(
+         qA)*(CcmY*sin(qB+qC)-CcmZ*cos(qB+qC))-TC-(sin(qB+qC)*(Cixz*sin(qB+qC)-
+         Cizz*cos(qB+qC))-cos(qB+qC)*(Cixz*cos(qB+qC)-Ciyy*sin(qB+qC)))*qA'^2-
+         mC*(BoZ*CcmY*sin(qB+qC)*qA'^2+CcmZ*cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*
+         sin(qB+qC))*qA'^2+CcmY*sin(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin
+         (qB))*qA'^2)-BoZ*CcmZ*cos(qB+qC)*qA'^2-CcmY*sin(qB+qC)*(CcmY*cos(qB+
+         qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*cos(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(
+         qB)-CoZ*sin(qB))*qA'^2)-CcmY*cos(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-
+         CoZ*sin(qB))*qA'^2)-CcmZ*sin(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*
+         sin(qB))*qA'^2)))+((Ciyz*cos(qB+qC)-Cixy*sin(qB+qC)-mC*(BoX*CcmY*sin(
+         qB+qC)+CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qB+qC)-BoX*CcmZ*cos(qB+qC)-
+         CcmX*CcmY*sin(qB+qC)-CcmZ*CoX*cos(qB+qC)))*(Cixy*sin(qB+qC)-Ciyz*cos(
+         qB+qC)-mC*(BoX*CcmZ*cos(qB+qC)+CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CcmZ*cos(
+         qB+qC)-CcmY*CoX*sin(qC)*cos(qB)-CcmY*(BoX-CcmX)*sin(qB+qC)-CoX*sin(qB)
+         *(CcmY*cos(qC)+CcmZ*sin(qC))))+(Cixx+mC*(CcmY^2+CcmZ^2))*(Aiyy+Bizz+
+         Cizz+mA*(AcmX^2+AcmZ^2)+sin(qB)*(Biyy*sin(qB)+2*Bixz*cos(qB)-Bizz*sin(
+         qB))+sin(qB+qC)*(Ciyy*sin(qB+qC)-2*Cixz*cos(qB+qC)-Cizz*sin(qB+qC))+
+         mB*(BcmX^2+BoX^2+BoZ^2+2*BcmX*BoX+(BcmY*cos(qB)-BcmZ*sin(qB))^2+2*BoZ*
+         (BcmY*cos(qB)-BcmZ*sin(qB)))+mC*(BoX^2+BoZ^2+CcmX^2+CoX^2+2*BoX*CoX+(
+         CoY*cos(qB)-CoZ*sin(qB))^2+(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))^2+2*BoZ*(
+         CoY*cos(qB)-CoZ*sin(qB))-2*BoX*CcmX-2*CcmX*CoX-2*BoZ*(CcmY*cos(qB+qC)+
+         CcmZ*sin(qB+qC))-2*(CoY*cos(qB)-CoZ*sin(qB))*(CcmY*cos(qB+qC)+CcmZ*sin
+         (qB+qC)))))*(TB+mB*g*cos(qA)*(BcmY*sin(qB)+BcmZ*cos(qB))+(sin(qB+qC)*(
+         Cixz*sin(qB+qC)-Cizz*cos(qB+qC))-cos(qB+qC)*(Cixz*cos(qB+qC)-Ciyy*sin(
+         qB+qC)))*qA'^2-mC*g*cos(qA)*(CcmY*sin(qB+qC)-CoY*sin(qB)-CoZ*cos(qB)-
+         CcmZ*cos(qB+qC))-(sin(qB)*(Bixz*sin(qB)+Bizz*cos(qB))-cos(qB)*(Bixz*
+         cos(qB)+Biyy*sin(qB)))*qA'^2-mB*(BcmY*BoZ*sin(qB)+BcmZ*BoZ*cos(qB)+Bc
+         mY*sin(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))+BcmZ*cos(qB)*(BcmY*cos(qB)-BcmZ
+         *sin(qB)))*qA'^2-mC*(BoZ*CoY*sin(qB)*qA'^2+BoZ*CoZ*cos(qB)*qA'^2+BoZ*
+         CcmZ*cos(qB+qC)*qA'^2+CcmX*CoZ*sin(qB)*qA'*(qB'+qC')+CoY*sin(qB)*(CoY*
+         cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         +CcmY*sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+CcmZ*cos(qC)*
+         (CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)+CcmY*cos(qC)*(CoZ*qB'^2
+         -sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)+CcmZ*sin(qC)*(CoZ*qB'^2-sin(
+         qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)+CoY*sin(qC)*((qB'+qC')*(CcmY*(qB'
+         +qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))
+         *qA'^2)-BoZ*CcmY*sin(qB+qC)*qA'^2-CcmX*CoY*cos(qB)*qA'*(qB'+qC')-CcmZ*
+         cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmY*sin(qC)*(CoY*qB'^2
+         +cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)-CoZ*cos(qC)*((qB'+qC')*(CcmY
+         *(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(
+         qB+qC))*qA'^2)-CoY*cos(qC)*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*
+         qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)-CoZ*sin(qC)*(
+         (qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(
+         qB+qC)+CcmZ*sin(qB+qC))*qA'^2)))-((Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*
+         sin(qC)+CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CcmZ*CoZ*cos(qC)))*(Ciyz*cos(
+         qB+qC)-Cixy*sin(qB+qC)-mC*(BoX*CcmY*sin(qB+qC)+CcmX*CcmZ*cos(qB+qC)+
+         CcmY*CoX*sin(qB+qC)-BoX*CcmZ*cos(qB+qC)-CcmX*CcmY*sin(qB+qC)-CcmZ*CoX*
+         cos(qB+qC)))-(Cixx+mC*(CcmY^2+CcmZ^2))*(Ciyz*cos(qB+qC)+mB*(BcmX*BcmY*
+         sin(qB)+BcmX*BcmZ*cos(qB)+BcmY*BoX*sin(qB)+BcmZ*BoX*cos(qB))-Bixy*sin(
+         qB)-Biyz*cos(qB)-Cixy*sin(qB+qC)-mC*(CcmX*CoY*sin(qB)+CcmX*CoZ*cos(qB)
+         +BoX*CcmY*sin(qB+qC)+CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qB+qC)-BoX*CoY*
+         sin(qB)-BoX*CoZ*cos(qB)-CoX*CoY*sin(qB)-CoX*CoZ*cos(qB)-BoX*CcmZ*cos(
+         qB+qC)-CcmX*CcmY*sin(qB+qC)-CcmZ*CoX*cos(qB+qC))))*(2*Bixz*cos(qB)^2*
+         qA'*qB'+2*Biyy*sin(qB)*cos(qB)*qA'*qB'+sin(qB)*qB'*(Biyz*qB'-2*Bixz*
+         sin(qB)*qA'-2*Bizz*cos(qB)*qA')+sin(qB+qC)*(qB'+qC')*(2*Ciyy*cos(qB+
+         qC)*qA'+3*Cixz*sin(qB+qC)*qA'-Ciyz*(qB'+qC')-2*Cizz*cos(qB+qC)*qA')+
+         mB*(BcmX*cos(qB)*(BcmY*qB'^2+cos(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2)
+         +BoX*cos(qB)*(BcmY*qB'^2+cos(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2)-2*
+         BoZ*(BcmY*sin(qB)+BcmZ*cos(qB))*qA'*qB'-BoX*(BcmY*cos(qB)-BcmZ*sin(qB))
+         *qA'^2-(BcmX+BoX)*sin(qB)*(BcmZ*qB'^2-sin(qB)*(BcmY*cos(qB)-BcmZ*sin(
+         qB))*qA'^2)-(BcmY*cos(qB)-BcmZ*sin(qB))*qA'*(BcmX*qA'+2*BcmY*sin(qB)*
+         qB'+2*BcmZ*cos(qB)*qB'))-TA-mA*g*(AcmX*cos(qA)+AcmZ*sin(qA))-mB*g*(Bc
+         mX*cos(qA)+BoX*cos(qA)+BoZ*sin(qA)+sin(qA)*(BcmY*cos(qB)-BcmZ*sin(qB)))
+         -mC*g*(BoX*cos(qA)+BoZ*sin(qA)+CoX*cos(qA)+sin(qA)*(CoY*cos(qB)-CoZ*
+         sin(qB))-CcmX*cos(qA)-sin(qA)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC)))-Cixz*
+         qA'*(qB'+qC')-Bixy*cos(qB)*qB'^2-cos(qB+qC)*(qB'+qC')*(Cixy*(qB'+qC')+
+         Cixz*cos(qB+qC)*qA')-mC*(BoX*CcmY*cos(qB+qC)*(qB'+qC')^2+2*BoZ*(CoY*
+         sin(qB)+CoZ*cos(qB))*qA'*qB'+2*(CoY*sin(qB)+CoZ*cos(qB))*(CoY*cos(qB)-
+         CoZ*sin(qB))*qA'*qB'+CcmX*cos(qC)*cos(qB+qC)*(CoY*qB'^2+cos(qB)*(CoY*
+         cos(qB)-CoZ*sin(qB))*qA'^2)+CcmX*sin(qC)*cos(qB+qC)*(CoZ*qB'^2-sin(qB)
+         *(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)+2*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*
+         (CcmY*sin(qB+qC)-CcmZ*cos(qB+qC))*qA'*(qB'+qC')+CoX*cos(qB)*cos(qC)*((
+         qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+
+         qC)+CcmZ*sin(qB+qC))*qA'^2)+CoX*sin(qC)*cos(qB)*((qB'+qC')*(CcmZ*(qB'+
+         qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))
+         *qA'^2)+sin(qB+qC)*(BoX*CcmZ*(qB'+qC')^2+CcmX*sin(qC)*(CoY*qB'^2+cos(
+         qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)-CcmX*CcmZ*(qB'+qC')^2-CcmX*cos(
+         qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2))-BoX*CoY*cos(
+         qB)*qB'^2-CoX*CoY*cos(qB)*qB'^2-CcmX*CcmY*cos(qB+qC)*(qB'+qC')^2-2*BoZ
+         *(CcmY*sin(qB+qC)-CcmZ*cos(qB+qC))*qA'*(qB'+qC')-(CcmY*cos(qB+qC)+CcmZ
+         *sin(qB+qC))*qA'*(CoX*qA'+2*CoY*sin(qB)*qB'+2*CoZ*cos(qB)*qB')-(CoY*
+         cos(qB)-CoZ*sin(qB))*qA'*(CcmX*qA'+2*CcmY*sin(qB+qC)*(qB'+qC')-2*CcmZ*
+         cos(qB+qC)*(qB'+qC'))-sin(qB)*(CoX*sin(qC)*((qB'+qC')*(CcmY*(qB'+qC')+
+         CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)
+         -BoX*CoZ*qB'^2-CoX*CoZ*qB'^2-CoX*cos(qC)*((qB'+qC')*(CcmZ*(qB'+qC')-
+         CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)))))
+         /((Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2
+         -CcmZ*CoZ*cos(qC)))*((Cixy*sin(qB+qC)-Ciyz*cos(qB+qC)-mC*(BoX*CcmZ*cos
+         (qB+qC)+CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CcmZ*cos(qB+qC)-CcmY*CoX*sin(qC)
+         *cos(qB)-CcmY*(BoX-CcmX)*sin(qB+qC)-CoX*sin(qB)*(CcmY*cos(qC)+CcmZ*sin
+         (qC))))*(Ciyz*cos(qB+qC)+mB*(BcmX*BcmY*sin(qB)+BcmX*BcmZ*cos(qB)+BcmY*
+         BoX*sin(qB)+BcmZ*BoX*cos(qB))-Bixy*sin(qB)-Biyz*cos(qB)-Cixy*sin(qB+
+         qC)-mC*(CcmX*CoY*sin(qB)+CcmX*CoZ*cos(qB)+BoX*CcmY*sin(qB+qC)+CcmX*Cc
+         mZ*cos(qB+qC)+CcmY*CoX*sin(qB+qC)-BoX*CoY*sin(qB)-BoX*CoZ*cos(qB)-CoX*
+         CoY*sin(qB)-CoX*CoZ*cos(qB)-BoX*CcmZ*cos(qB+qC)-CcmX*CcmY*sin(qB+qC)-
+         CcmZ*CoX*cos(qB+qC)))+(Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+CcmZ
+         *CoY*sin(qC)-CcmY^2-CcmZ^2-CcmZ*CoZ*cos(qC)))*(Aiyy+Bizz+Cizz+mA*(AcmX^2
+         +AcmZ^2)+sin(qB)*(Biyy*sin(qB)+2*Bixz*cos(qB)-Bizz*sin(qB))+sin(qB+qC)
+         *(Ciyy*sin(qB+qC)-2*Cixz*cos(qB+qC)-Cizz*sin(qB+qC))+mB*(BcmX^2+BoX^2+BoZ^2
+         +2*BcmX*BoX+(BcmY*cos(qB)-BcmZ*sin(qB))^2+2*BoZ*(BcmY*cos(qB)-BcmZ*sin
+         (qB)))+mC*(BoX^2+BoZ^2+CcmX^2+CoX^2+2*BoX*CoX+(CoY*cos(qB)-CoZ*sin(qB))^2
+         +(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))^2+2*BoZ*(CoY*cos(qB)-CoZ*sin(qB))-2
+         *BoX*CcmX-2*CcmX*CoX-2*BoZ*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))-2*(CoY*
+         cos(qB)-CoZ*sin(qB))*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC)))))-(Ciyz*cos(
+         qB+qC)-Cixy*sin(qB+qC)-mC*(BoX*CcmY*sin(qB+qC)+CcmX*CcmZ*cos(qB+qC)+
+         CcmY*CoX*sin(qB+qC)-BoX*CcmZ*cos(qB+qC)-CcmX*CcmY*sin(qB+qC)-CcmZ*CoX*
+         cos(qB+qC)))*((Bixx+Cixx+mB*(BcmY^2+BcmZ^2)-mC*(2*CcmY*CoY*cos(qC)+2*
+         CcmY*CoZ*sin(qC)+2*CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CoY^2-CoZ^2-2*CcmZ*
+         CoZ*cos(qC)))*(Cixy*sin(qB+qC)-Ciyz*cos(qB+qC)-mC*(BoX*CcmZ*cos(qB+qC)
+         +CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CcmZ*cos(qB+qC)-CcmY*CoX*sin(qC)*cos(
+         qB)-CcmY*(BoX-CcmX)*sin(qB+qC)-CoX*sin(qB)*(CcmY*cos(qC)+CcmZ*sin(qC))))
+         +(Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2
+         -CcmZ*CoZ*cos(qC)))*(Ciyz*cos(qB+qC)+mB*(BcmX*BcmZ*cos(qB)+BcmZ*BoX*
+         cos(qB)+BcmY*(BcmX+BoX)*sin(qB))-Bixy*sin(qB)-Biyz*cos(qB)-Cixy*sin(
+         qB+qC)-mC*(CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qC)*cos(qB)+CcmX*CoZ*cos(
+         qC)*cos(qB+qC)-BoX*CoZ*cos(qB)-CoX*CoZ*cos(qB)-BoX*CcmZ*cos(qB+qC)-Cc
+         mZ*CoX*cos(qB)*cos(qC)-CcmX*CoY*sin(qC)*cos(qB+qC)-sin(qB)*(BoX*CoY+
+         CoX*CoY-CcmY*CoX*cos(qC)-CcmZ*CoX*sin(qC))-sin(qB+qC)*(CcmX*CcmY-BoX*
+         CcmY-CcmX*CoY*cos(qC)-CcmX*CoZ*sin(qC)))))-(Cixx+mC*(CcmY^2+CcmZ^2))*(
+         (Bixx+Cixx+mB*(BcmY^2+BcmZ^2)-mC*(2*CcmY*CoY*cos(qC)+2*CcmY*CoZ*sin(
+         qC)+2*CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CoY^2-CoZ^2-2*CcmZ*CoZ*cos(qC)))*
+         (Aiyy+Bizz+Cizz+mA*(AcmX^2+AcmZ^2)+sin(qB)*(Biyy*sin(qB)+2*Bixz*cos(
+         qB)-Bizz*sin(qB))+sin(qB+qC)*(Ciyy*sin(qB+qC)-2*Cixz*cos(qB+qC)-Cizz*
+         sin(qB+qC))+mB*(BcmX^2+BoX^2+BoZ^2+2*BcmX*BoX+(BcmY*cos(qB)-BcmZ*sin(
+         qB))^2+2*BoZ*(BcmY*cos(qB)-BcmZ*sin(qB)))+mC*(BoX^2+BoZ^2+CcmX^2+CoX^2
+         +2*BoX*CoX+(CoY*cos(qB)-CoZ*sin(qB))^2+(CcmY*cos(qB+qC)+CcmZ*sin(qB+
+         qC))^2+2*BoZ*(CoY*cos(qB)-CoZ*sin(qB))-2*BoX*CcmX-2*CcmX*CoX-2*BoZ*(
+         CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))-2*(CoY*cos(qB)-CoZ*sin(qB))*(CcmY*cos
+         (qB+qC)+CcmZ*sin(qB+qC))))-(Ciyz*cos(qB+qC)+mB*(BcmX*BcmY*sin(qB)+BcmX
+         *BcmZ*cos(qB)+BcmY*BoX*sin(qB)+BcmZ*BoX*cos(qB))-Bixy*sin(qB)-Biyz*cos
+         (qB)-Cixy*sin(qB+qC)-mC*(CcmX*CoY*sin(qB)+CcmX*CoZ*cos(qB)+BoX*CcmY*
+         sin(qB+qC)+CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qB+qC)-BoX*CoY*sin(qB)-
+         BoX*CoZ*cos(qB)-CoX*CoY*sin(qB)-CoX*CoZ*cos(qB)-BoX*CcmZ*cos(qB+qC)-
+         CcmX*CcmY*sin(qB+qC)-CcmZ*CoX*cos(qB+qC)))*(Ciyz*cos(qB+qC)+mB*(BcmX*
+         BcmZ*cos(qB)+BcmZ*BoX*cos(qB)+BcmY*(BcmX+BoX)*sin(qB))-Bixy*sin(qB)-
+         Biyz*cos(qB)-Cixy*sin(qB+qC)-mC*(CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qC)
+         *cos(qB)+CcmX*CoZ*cos(qC)*cos(qB+qC)-BoX*CoZ*cos(qB)-CoX*CoZ*cos(qB)-
+         BoX*CcmZ*cos(qB+qC)-CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CoY*sin(qC)*cos(qB+
+         qC)-sin(qB)*(BoX*CoY+CoX*CoY-CcmY*CoX*cos(qC)-CcmZ*CoX*sin(qC))-sin(
+         qB+qC)*(CcmX*CcmY-BoX*CcmY-CcmX*CoY*cos(qC)-CcmX*CoZ*sin(qC))))))
+
+-> (155) qC'' = (((Bixx+Cixx+mB*(BcmY^2+BcmZ^2)-mC*(2*CcmY*CoY*cos(qC)+2*CcmY*
+         CoZ*sin(qC)+2*CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CoY^2-CoZ^2-2*CcmZ*CoZ*
+         cos(qC)))*(Aiyy+Bizz+Cizz+mA*(AcmX^2+AcmZ^2)+sin(qB)*(Biyy*sin(qB)+2*
+         Bixz*cos(qB)-Bizz*sin(qB))+sin(qB+qC)*(Ciyy*sin(qB+qC)-2*Cixz*cos(qB+
+         qC)-Cizz*sin(qB+qC))+mB*(BcmX^2+BoX^2+BoZ^2+2*BcmX*BoX+(BcmY*cos(qB)-
+         BcmZ*sin(qB))^2+2*BoZ*(BcmY*cos(qB)-BcmZ*sin(qB)))+mC*(BoX^2+BoZ^2+CcmX^2
+         +CoX^2+2*BoX*CoX+(CoY*cos(qB)-CoZ*sin(qB))^2+(CcmY*cos(qB+qC)+CcmZ*sin
+         (qB+qC))^2+2*BoZ*(CoY*cos(qB)-CoZ*sin(qB))-2*BoX*CcmX-2*CcmX*CoX-2*BoZ
+         *(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))-2*(CoY*cos(qB)-CoZ*sin(qB))*(CcmY*
+         cos(qB+qC)+CcmZ*sin(qB+qC))))-(Ciyz*cos(qB+qC)+mB*(BcmX*BcmY*sin(qB)+
+         BcmX*BcmZ*cos(qB)+BcmY*BoX*sin(qB)+BcmZ*BoX*cos(qB))-Bixy*sin(qB)-Biyz
+         *cos(qB)-Cixy*sin(qB+qC)-mC*(CcmX*CoY*sin(qB)+CcmX*CoZ*cos(qB)+BoX*Cc
+         mY*sin(qB+qC)+CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qB+qC)-BoX*CoY*sin(qB)
+         -BoX*CoZ*cos(qB)-CoX*CoY*sin(qB)-CoX*CoZ*cos(qB)-BoX*CcmZ*cos(qB+qC)-
+         CcmX*CcmY*sin(qB+qC)-CcmZ*CoX*cos(qB+qC)))*(Ciyz*cos(qB+qC)+mB*(BcmX*
+         BcmZ*cos(qB)+BcmZ*BoX*cos(qB)+BcmY*(BcmX+BoX)*sin(qB))-Bixy*sin(qB)-
+         Biyz*cos(qB)-Cixy*sin(qB+qC)-mC*(CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qC)
+         *cos(qB)+CcmX*CoZ*cos(qC)*cos(qB+qC)-BoX*CoZ*cos(qB)-CoX*CoZ*cos(qB)-
+         BoX*CcmZ*cos(qB+qC)-CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CoY*sin(qC)*cos(qB+
+         qC)-sin(qB)*(BoX*CoY+CoX*CoY-CcmY*CoX*cos(qC)-CcmZ*CoX*sin(qC))-sin(
+         qB+qC)*(CcmX*CcmY-BoX*CcmY-CcmX*CoY*cos(qC)-CcmX*CoZ*sin(qC)))))*(mC*g
+         *cos(qA)*(CcmY*sin(qB+qC)-CcmZ*cos(qB+qC))-TC-(sin(qB+qC)*(Cixz*sin(
+         qB+qC)-Cizz*cos(qB+qC))-cos(qB+qC)*(Cixz*cos(qB+qC)-Ciyy*sin(qB+qC)))*qA'^2
+         -mC*(BoZ*CcmY*sin(qB+qC)*qA'^2+CcmZ*cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*
+         sin(qB+qC))*qA'^2+CcmY*sin(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin
+         (qB))*qA'^2)-BoZ*CcmZ*cos(qB+qC)*qA'^2-CcmY*sin(qB+qC)*(CcmY*cos(qB+
+         qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*cos(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(
+         qB)-CoZ*sin(qB))*qA'^2)-CcmY*cos(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-
+         CoZ*sin(qB))*qA'^2)-CcmZ*sin(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*
+         sin(qB))*qA'^2)))-((Ciyz*cos(qB+qC)-Cixy*sin(qB+qC)-mC*(BoX*CcmY*sin(
+         qB+qC)+CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qB+qC)-BoX*CcmZ*cos(qB+qC)-
+         CcmX*CcmY*sin(qB+qC)-CcmZ*CoX*cos(qB+qC)))*(Ciyz*cos(qB+qC)+mB*(BcmX*
+         BcmZ*cos(qB)+BcmZ*BoX*cos(qB)+BcmY*(BcmX+BoX)*sin(qB))-Bixy*sin(qB)-
+         Biyz*cos(qB)-Cixy*sin(qB+qC)-mC*(CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qC)
+         *cos(qB)+CcmX*CoZ*cos(qC)*cos(qB+qC)-BoX*CoZ*cos(qB)-CoX*CoZ*cos(qB)-
+         BoX*CcmZ*cos(qB+qC)-CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CoY*sin(qC)*cos(qB+
+         qC)-sin(qB)*(BoX*CoY+CoX*CoY-CcmY*CoX*cos(qC)-CcmZ*CoX*sin(qC))-sin(
+         qB+qC)*(CcmX*CcmY-BoX*CcmY-CcmX*CoY*cos(qC)-CcmX*CoZ*sin(qC))))-(Cixx-
+         mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-
+         CcmZ*CoZ*cos(qC)))*(Aiyy+Bizz+Cizz+mA*(AcmX^2+AcmZ^2)+sin(qB)*(Biyy*
+         sin(qB)+2*Bixz*cos(qB)-Bizz*sin(qB))+sin(qB+qC)*(Ciyy*sin(qB+qC)-2*Ci
+         xz*cos(qB+qC)-Cizz*sin(qB+qC))+mB*(BcmX^2+BoX^2+BoZ^2+2*BcmX*BoX+(BcmY
+         *cos(qB)-BcmZ*sin(qB))^2+2*BoZ*(BcmY*cos(qB)-BcmZ*sin(qB)))+mC*(BoX^2+BoZ^2
+         +CcmX^2+CoX^2+2*BoX*CoX+(CoY*cos(qB)-CoZ*sin(qB))^2+(CcmY*cos(qB+qC)+
+         CcmZ*sin(qB+qC))^2+2*BoZ*(CoY*cos(qB)-CoZ*sin(qB))-2*BoX*CcmX-2*CcmX*
+         CoX-2*BoZ*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))-2*(CoY*cos(qB)-CoZ*sin(qB))
+         *(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC)))))*(TB+mB*g*cos(qA)*(BcmY*sin(qB)+
+         BcmZ*cos(qB))+(sin(qB+qC)*(Cixz*sin(qB+qC)-Cizz*cos(qB+qC))-cos(qB+qC)
+         *(Cixz*cos(qB+qC)-Ciyy*sin(qB+qC)))*qA'^2-mC*g*cos(qA)*(CcmY*sin(qB+
+         qC)-CoY*sin(qB)-CoZ*cos(qB)-CcmZ*cos(qB+qC))-(sin(qB)*(Bixz*sin(qB)+
+         Bizz*cos(qB))-cos(qB)*(Bixz*cos(qB)+Biyy*sin(qB)))*qA'^2-mB*(BcmY*BoZ*
+         sin(qB)+BcmZ*BoZ*cos(qB)+BcmY*sin(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))+BcmZ
+         *cos(qB)*(BcmY*cos(qB)-BcmZ*sin(qB)))*qA'^2-mC*(BoZ*CoY*sin(qB)*qA'^2+
+         BoZ*CoZ*cos(qB)*qA'^2+BoZ*CcmZ*cos(qB+qC)*qA'^2+CcmX*CoZ*sin(qB)*qA'*(
+         qB'+qC')+CoY*sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*cos(qB)*(CoY*
+         cos(qB)-CoZ*sin(qB))*qA'^2+CcmY*sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(
+         qB+qC))*qA'^2+CcmZ*cos(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))
+         *qA'^2)+CcmY*cos(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)
+         +CcmZ*sin(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)+CoY*
+         sin(qC)*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(
+         CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)-BoZ*CcmY*sin(qB+qC)*qA'^2-CcmX
+         *CoY*cos(qB)*qA'*(qB'+qC')-CcmZ*cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(
+         qB+qC))*qA'^2-CcmY*sin(qC)*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))
+         *qA'^2)-CoZ*cos(qC)*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+
+         cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)-CoY*cos(qC)*((qB'+
+         qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+
+         CcmZ*sin(qB+qC))*qA'^2)-CoZ*sin(qC)*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*
+         cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)))-
+         ((Bixx+Cixx+mB*(BcmY^2+BcmZ^2)-mC*(2*CcmY*CoY*cos(qC)+2*CcmY*CoZ*sin(
+         qC)+2*CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CoY^2-CoZ^2-2*CcmZ*CoZ*cos(qC)))*
+         (Ciyz*cos(qB+qC)-Cixy*sin(qB+qC)-mC*(BoX*CcmY*sin(qB+qC)+CcmX*CcmZ*cos
+         (qB+qC)+CcmY*CoX*sin(qB+qC)-BoX*CcmZ*cos(qB+qC)-CcmX*CcmY*sin(qB+qC)-
+         CcmZ*CoX*cos(qB+qC)))-(Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+CcmZ
+         *CoY*sin(qC)-CcmY^2-CcmZ^2-CcmZ*CoZ*cos(qC)))*(Ciyz*cos(qB+qC)+mB*(Bc
+         mX*BcmY*sin(qB)+BcmX*BcmZ*cos(qB)+BcmY*BoX*sin(qB)+BcmZ*BoX*cos(qB))-
+         Bixy*sin(qB)-Biyz*cos(qB)-Cixy*sin(qB+qC)-mC*(CcmX*CoY*sin(qB)+CcmX*
+         CoZ*cos(qB)+BoX*CcmY*sin(qB+qC)+CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qB+
+         qC)-BoX*CoY*sin(qB)-BoX*CoZ*cos(qB)-CoX*CoY*sin(qB)-CoX*CoZ*cos(qB)-
+         BoX*CcmZ*cos(qB+qC)-CcmX*CcmY*sin(qB+qC)-CcmZ*CoX*cos(qB+qC))))*(2*Bi
+         xz*cos(qB)^2*qA'*qB'+2*Biyy*sin(qB)*cos(qB)*qA'*qB'+sin(qB)*qB'*(Biyz*
+         qB'-2*Bixz*sin(qB)*qA'-2*Bizz*cos(qB)*qA')+sin(qB+qC)*(qB'+qC')*(2*Ci
+         yy*cos(qB+qC)*qA'+3*Cixz*sin(qB+qC)*qA'-Ciyz*(qB'+qC')-2*Cizz*cos(qB+
+         qC)*qA')+mB*(BcmX*cos(qB)*(BcmY*qB'^2+cos(qB)*(BcmY*cos(qB)-BcmZ*sin(
+         qB))*qA'^2)+BoX*cos(qB)*(BcmY*qB'^2+cos(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))
+         *qA'^2)-2*BoZ*(BcmY*sin(qB)+BcmZ*cos(qB))*qA'*qB'-BoX*(BcmY*cos(qB)-
+         BcmZ*sin(qB))*qA'^2-(BcmX+BoX)*sin(qB)*(BcmZ*qB'^2-sin(qB)*(BcmY*cos(
+         qB)-BcmZ*sin(qB))*qA'^2)-(BcmY*cos(qB)-BcmZ*sin(qB))*qA'*(BcmX*qA'+2*
+         BcmY*sin(qB)*qB'+2*BcmZ*cos(qB)*qB'))-TA-mA*g*(AcmX*cos(qA)+AcmZ*sin(
+         qA))-mB*g*(BcmX*cos(qA)+BoX*cos(qA)+BoZ*sin(qA)+sin(qA)*(BcmY*cos(qB)-
+         BcmZ*sin(qB)))-mC*g*(BoX*cos(qA)+BoZ*sin(qA)+CoX*cos(qA)+sin(qA)*(CoY*
+         cos(qB)-CoZ*sin(qB))-CcmX*cos(qA)-sin(qA)*(CcmY*cos(qB+qC)+CcmZ*sin(
+         qB+qC)))-Cixz*qA'*(qB'+qC')-Bixy*cos(qB)*qB'^2-cos(qB+qC)*(qB'+qC')*(
+         Cixy*(qB'+qC')+Cixz*cos(qB+qC)*qA')-mC*(BoX*CcmY*cos(qB+qC)*(qB'+qC')^2
+         +2*BoZ*(CoY*sin(qB)+CoZ*cos(qB))*qA'*qB'+2*(CoY*sin(qB)+CoZ*cos(qB))*(
+         CoY*cos(qB)-CoZ*sin(qB))*qA'*qB'+CcmX*cos(qC)*cos(qB+qC)*(CoY*qB'^2+
+         cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)+CcmX*sin(qC)*cos(qB+qC)*(CoZ*qB'^2
+         -sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)+2*(CcmY*cos(qB+qC)+CcmZ*sin(
+         qB+qC))*(CcmY*sin(qB+qC)-CcmZ*cos(qB+qC))*qA'*(qB'+qC')+CoX*cos(qB)*
+         cos(qC)*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(
+         CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2)+CoX*sin(qC)*cos(qB)*((qB'+qC')
+         *(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ
+         *sin(qB+qC))*qA'^2)+sin(qB+qC)*(BoX*CcmZ*(qB'+qC')^2+CcmX*sin(qC)*(CoY
+         *qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2)-CcmX*CcmZ*(qB'+qC')^2-
+         CcmX*cos(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2))-BoX*
+         CoY*cos(qB)*qB'^2-CoX*CoY*cos(qB)*qB'^2-CcmX*CcmY*cos(qB+qC)*(qB'+qC')^2
+         -2*BoZ*(CcmY*sin(qB+qC)-CcmZ*cos(qB+qC))*qA'*(qB'+qC')-(CcmY*cos(qB+
+         qC)+CcmZ*sin(qB+qC))*qA'*(CoX*qA'+2*CoY*sin(qB)*qB'+2*CoZ*cos(qB)*qB')
+         -(CoY*cos(qB)-CoZ*sin(qB))*qA'*(CcmX*qA'+2*CcmY*sin(qB+qC)*(qB'+qC')-2
+         *CcmZ*cos(qB+qC)*(qB'+qC'))-sin(qB)*(CoX*sin(qC)*((qB'+qC')*(CcmY*(qB'
+         +qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))
+         *qA'^2)-BoX*CoZ*qB'^2-CoX*CoZ*qB'^2-CoX*cos(qC)*((qB'+qC')*(CcmZ*(qB'+
+         qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))
+         *qA'^2)))))/((Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+CcmZ*CoY*sin(
+         qC)-CcmY^2-CcmZ^2-CcmZ*CoZ*cos(qC)))*((Cixy*sin(qB+qC)-Ciyz*cos(qB+qC)
+         -mC*(BoX*CcmZ*cos(qB+qC)+CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CcmZ*cos(qB+qC)
+         -CcmY*CoX*sin(qC)*cos(qB)-CcmY*(BoX-CcmX)*sin(qB+qC)-CoX*sin(qB)*(CcmY
+         *cos(qC)+CcmZ*sin(qC))))*(Ciyz*cos(qB+qC)+mB*(BcmX*BcmY*sin(qB)+BcmX*
+         BcmZ*cos(qB)+BcmY*BoX*sin(qB)+BcmZ*BoX*cos(qB))-Bixy*sin(qB)-Biyz*cos(
+         qB)-Cixy*sin(qB+qC)-mC*(CcmX*CoY*sin(qB)+CcmX*CoZ*cos(qB)+BoX*CcmY*sin
+         (qB+qC)+CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qB+qC)-BoX*CoY*sin(qB)-BoX*
+         CoZ*cos(qB)-CoX*CoY*sin(qB)-CoX*CoZ*cos(qB)-BoX*CcmZ*cos(qB+qC)-CcmX*
+         CcmY*sin(qB+qC)-CcmZ*CoX*cos(qB+qC)))+(Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*
+         CoZ*sin(qC)+CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CcmZ*CoZ*cos(qC)))*(Aiyy+
+         Bizz+Cizz+mA*(AcmX^2+AcmZ^2)+sin(qB)*(Biyy*sin(qB)+2*Bixz*cos(qB)-Bizz
+         *sin(qB))+sin(qB+qC)*(Ciyy*sin(qB+qC)-2*Cixz*cos(qB+qC)-Cizz*sin(qB+
+         qC))+mB*(BcmX^2+BoX^2+BoZ^2+2*BcmX*BoX+(BcmY*cos(qB)-BcmZ*sin(qB))^2+2
+         *BoZ*(BcmY*cos(qB)-BcmZ*sin(qB)))+mC*(BoX^2+BoZ^2+CcmX^2+CoX^2+2*BoX*
+         CoX+(CoY*cos(qB)-CoZ*sin(qB))^2+(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))^2+2*
+         BoZ*(CoY*cos(qB)-CoZ*sin(qB))-2*BoX*CcmX-2*CcmX*CoX-2*BoZ*(CcmY*cos(
+         qB+qC)+CcmZ*sin(qB+qC))-2*(CoY*cos(qB)-CoZ*sin(qB))*(CcmY*cos(qB+qC)+
+         CcmZ*sin(qB+qC)))))-(Ciyz*cos(qB+qC)-Cixy*sin(qB+qC)-mC*(BoX*CcmY*sin(
+         qB+qC)+CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qB+qC)-BoX*CcmZ*cos(qB+qC)-
+         CcmX*CcmY*sin(qB+qC)-CcmZ*CoX*cos(qB+qC)))*((Bixx+Cixx+mB*(BcmY^2+BcmZ^2)
+         -mC*(2*CcmY*CoY*cos(qC)+2*CcmY*CoZ*sin(qC)+2*CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2
+         -CoY^2-CoZ^2-2*CcmZ*CoZ*cos(qC)))*(Cixy*sin(qB+qC)-Ciyz*cos(qB+qC)-mC*
+         (BoX*CcmZ*cos(qB+qC)+CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CcmZ*cos(qB+qC)-Cc
+         mY*CoX*sin(qC)*cos(qB)-CcmY*(BoX-CcmX)*sin(qB+qC)-CoX*sin(qB)*(CcmY*
+         cos(qC)+CcmZ*sin(qC))))+(Cixx-mC*(CcmY*CoY*cos(qC)+CcmY*CoZ*sin(qC)+
+         CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CcmZ*CoZ*cos(qC)))*(Ciyz*cos(qB+qC)+mB*
+         (BcmX*BcmZ*cos(qB)+BcmZ*BoX*cos(qB)+BcmY*(BcmX+BoX)*sin(qB))-Bixy*sin(
+         qB)-Biyz*cos(qB)-Cixy*sin(qB+qC)-mC*(CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin
+         (qC)*cos(qB)+CcmX*CoZ*cos(qC)*cos(qB+qC)-BoX*CoZ*cos(qB)-CoX*CoZ*cos(
+         qB)-BoX*CcmZ*cos(qB+qC)-CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CoY*sin(qC)*cos(
+         qB+qC)-sin(qB)*(BoX*CoY+CoX*CoY-CcmY*CoX*cos(qC)-CcmZ*CoX*sin(qC))-sin
+         (qB+qC)*(CcmX*CcmY-BoX*CcmY-CcmX*CoY*cos(qC)-CcmX*CoZ*sin(qC)))))-(Ci
+         xx+mC*(CcmY^2+CcmZ^2))*((Bixx+Cixx+mB*(BcmY^2+BcmZ^2)-mC*(2*CcmY*CoY*
+         cos(qC)+2*CcmY*CoZ*sin(qC)+2*CcmZ*CoY*sin(qC)-CcmY^2-CcmZ^2-CoY^2-CoZ^2
+         -2*CcmZ*CoZ*cos(qC)))*(Aiyy+Bizz+Cizz+mA*(AcmX^2+AcmZ^2)+sin(qB)*(Biyy
+         *sin(qB)+2*Bixz*cos(qB)-Bizz*sin(qB))+sin(qB+qC)*(Ciyy*sin(qB+qC)-2*
+         Cixz*cos(qB+qC)-Cizz*sin(qB+qC))+mB*(BcmX^2+BoX^2+BoZ^2+2*BcmX*BoX+(
+         BcmY*cos(qB)-BcmZ*sin(qB))^2+2*BoZ*(BcmY*cos(qB)-BcmZ*sin(qB)))+mC*(BoX^2
+         +BoZ^2+CcmX^2+CoX^2+2*BoX*CoX+(CoY*cos(qB)-CoZ*sin(qB))^2+(CcmY*cos(
+         qB+qC)+CcmZ*sin(qB+qC))^2+2*BoZ*(CoY*cos(qB)-CoZ*sin(qB))-2*BoX*CcmX-2
+         *CcmX*CoX-2*BoZ*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))-2*(CoY*cos(qB)-CoZ*
+         sin(qB))*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))))-(Ciyz*cos(qB+qC)+mB*(BcmX
+         *BcmY*sin(qB)+BcmX*BcmZ*cos(qB)+BcmY*BoX*sin(qB)+BcmZ*BoX*cos(qB))-Bi
+         xy*sin(qB)-Biyz*cos(qB)-Cixy*sin(qB+qC)-mC*(CcmX*CoY*sin(qB)+CcmX*CoZ*
+         cos(qB)+BoX*CcmY*sin(qB+qC)+CcmX*CcmZ*cos(qB+qC)+CcmY*CoX*sin(qB+qC)-
+         BoX*CoY*sin(qB)-BoX*CoZ*cos(qB)-CoX*CoY*sin(qB)-CoX*CoZ*cos(qB)-BoX*
+         CcmZ*cos(qB+qC)-CcmX*CcmY*sin(qB+qC)-CcmZ*CoX*cos(qB+qC)))*(Ciyz*cos(
+         qB+qC)+mB*(BcmX*BcmZ*cos(qB)+BcmZ*BoX*cos(qB)+BcmY*(BcmX+BoX)*sin(qB))
+         -Bixy*sin(qB)-Biyz*cos(qB)-Cixy*sin(qB+qC)-mC*(CcmX*CcmZ*cos(qB+qC)+
+         CcmY*CoX*sin(qC)*cos(qB)+CcmX*CoZ*cos(qC)*cos(qB+qC)-BoX*CoZ*cos(qB)-
+         CoX*CoZ*cos(qB)-BoX*CcmZ*cos(qB+qC)-CcmZ*CoX*cos(qB)*cos(qC)-CcmX*CoY*
+         sin(qC)*cos(qB+qC)-sin(qB)*(BoX*CoY+CoX*CoY-CcmY*CoX*cos(qC)-CcmZ*CoX*
+         sin(qC))-sin(qB+qC)*(CcmX*CcmY-BoX*CcmY-CcmX*CoY*cos(qC)-CcmX*CoZ*sin(
+         qC))))))
+
+   (156) Solve( Dynamics = 0, Fx, Fy, Fz, Ty, Tz)
+-> (157) Fx = mC*CcmX*qA'*(qB'+qC') + mC*sin(qB+qC)*(CcmY*(qB'+qC')^2-CcmZ*(qB
+         ''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+
+         cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))) - sin(qB)*(
+         mB*(BcmY*qB'^2+BcmZ*qB'')+mC*(CoY*qB'^2+CoZ*qB'')) - cos(qB)*(mB*(BcmZ
+         *qB'^2-BcmY*qB'')+mC*(CoZ*qB'^2-CoY*qB'')) - mC*cos(qB+qC)*(CcmZ*(qB'+
+         qC')^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'
+         +sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))
+
+-> (158) Fy = mC*sin(qA)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2 + sin(qA)*sin(
+         qB)*(mB*(BcmZ*qB'^2-BcmY*qB'')+mC*(CoZ*qB'^2-CoY*qB'')) + mC*sin(qA)*
+         sin(qB+qC)*(CcmZ*(qB'+qC')^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*
+         qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)
+         *qA'*qC'-cos(qB)*qA''))) + mC*sin(qA)*cos(qB+qC)*(CcmY*(qB'+qC')^2-Cc
+         mZ*(qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*
+         qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))) + cos(
+         qA)*(mB*(BcmY*cos(qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*cos
+         (qB)*qB')-BcmZ*sin(qB)*qA'')-mC*(CoX*qA'^2+2*CoY*sin(qB)*qA'*qB'+2*CoZ
+         *cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA'')) + mC*cos(qA)*(qA'*(
+         CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+CcmY*(
+         sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(
+         qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*qA'*
+         qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'
+         *qC'-cos(qB)*qA''))) - mB*sin(qA)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2
+         - mC*sin(qA)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2 - mB*BcmX*sin(qA)*qA''
+         - mC*CoX*sin(qA)*qA'' - sin(qA)*cos(qB)*(mB*(BcmY*qB'^2+BcmZ*qB'')+mC*
+         (CoY*qB'^2+CoZ*qB'')) - sin(qA)*(mA*(AcmZ*qA'^2+AcmX*qA'')+mB*(BoZ*qA'^2
+         +BoX*qA'')+mC*(BoZ*qA'^2+BoX*qA'')) - cos(qA)*(mA*(AcmX*qA'^2-AcmZ*qA
+         '')+mB*(BoX*qA'^2-BoZ*qA'')+mC*(BoX*qA'^2-BoZ*qA''))
+
+-> (159) Fz = mA*g + mB*g + mC*g + mC*cos(qA)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))
+         *qA'^2 + sin(qB)*cos(qA)*(mB*(BcmZ*qB'^2-BcmY*qB'')+mC*(CoZ*qB'^2-CoY*
+         qB'')) + sin(qA)*(mA*(AcmX*qA'^2-AcmZ*qA'')+mB*(BoX*qA'^2-BoZ*qA'')+
+         mC*(BoX*qA'^2-BoZ*qA'')) + mC*cos(qA)*sin(qB+qC)*(CcmZ*(qB'+qC')^2+Cc
+         mY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*
+         qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))) + mC*
+         cos(qA)*cos(qB+qC)*(CcmY*(qB'+qC')^2-CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(
+         cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'
+         +sin(qB)*qA'*qC'-cos(qB)*qA''))) - mB*cos(qA)*(BcmY*cos(qB)-BcmZ*sin(
+         qB))*qA'^2 - mC*cos(qA)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2 - mB*BcmX*cos(
+         qA)*qA'' - mC*CoX*cos(qA)*qA'' - cos(qA)*cos(qB)*(mB*(BcmY*qB'^2+BcmZ*
+         qB'')+mC*(CoY*qB'^2+CoZ*qB'')) - cos(qA)*(mA*(AcmZ*qA'^2+AcmX*qA'')+
+         mB*(BoZ*qA'^2+BoX*qA'')+mC*(BoZ*qA'^2+BoX*qA'')) - sin(qA)*(mB*(BcmY*
+         cos(qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*cos(qB)*qB')-BcmZ
+         *sin(qB)*qA'')-mC*(CoX*qA'^2+2*CoY*sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*
+         qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA'')) - mC*sin(qA)*(qA'*(CcmX*qA'+CcmY*
+         sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+CcmY*(sin(qC)*(cos(qB)
+         *qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(
+         qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*
+         qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA
+         '')))
+
+-> (160) Ty = mA*AcmY*g + mB*BoY*g + mC*BoY*g + mC*CcmY*g*sin(qB+qC) + sin(qA)*
+         (Aiyz*qA''+mA*AcmY*(AcmX*qA'^2-AcmZ*qA'')+mB*BoY*(BoX*qA'^2-BoZ*qA'')+
+         mC*BoY*(BoX*qA'^2-BoZ*qA'')+mC*BoY*(CoX*qA'^2+2*CoY*sin(qB)*qA'*qB'+2*
+         CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA'')-Aixy*qA'^2-mB*BoY*
+         (BcmY*cos(qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*cos(qB)*qB')
+         -BcmZ*sin(qB)*qA'')-mC*BoY*(qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-
+         CcmZ*cos(qB+qC)*(qB'+qC'))+CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*
+         qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA
+         ''))-CcmZ*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(
+         qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))) + sin(qA)*sin(
+         qB+qC)*(sin(qB+qC)*qA'*(Cixy*sin(qB+qC)*qA'-Cixx*(qB'+qC')-Ciyz*cos(
+         qB+qC)*qA')+Ciyz*(qB''+qC'')+mC*CcmY*(BoX*qA'^2-BoZ*qA'')+mC*CcmY*(CoX
+         *qA'^2+2*CoY*sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*
+         sin(qB))*qA'')+mC*CcmX*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')
+         +cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''+qC'')-
+         CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(
+         sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-(qB'+qC')*(Cixy*(qB'+
+         qC')+Cixz*cos(qB+qC)*qA'-Ciyy*sin(qB+qC)*qA')-Cizz*(sin(qC)*(cos(qB)*
+         qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)
+         *qA'*qC'-cos(qB)*qA''))-Cixz*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'
+         +sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))
+         -mC*BoX*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(
+         CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''+qC'')-CcmX*(sin(qC)*
+         (cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*
+         qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*CoX*((qB'+qC')*(CcmY*(qB'+qC')+
+         CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2
+         -CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(
+         qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*
+         CcmY*(qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))
+         +CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*
+         (sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)
+         *qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(
+         qB)*qA'*qC'-cos(qB)*qA'')))) + cos(qA)*(mC*BoZ*CcmX*qA'*(qB'+qC')+mC*
+         BoY*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+qA'*(cos(qB+qC)*(Cixy*(qB'
+         +qC')+Cixz*cos(qB+qC)*qA'-Ciyy*sin(qB+qC)*qA')-sin(qB+qC)*(Cixz*sin(
+         qB+qC)*qA'-Ciyz*(qB'+qC')-Cizz*cos(qB+qC)*qA'))+Cixx*(qB''+qC'')+mC*
+         CcmX*CoZ*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')+mC*CoY*sin(qC)
+         *((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(
+         qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''+qC''))+mC*BoY*sin(qB+qC)*(Cc
+         mZ*(qB'+qC')^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)
+         *qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(
+         qB)*qA'')))+mC*BoY*cos(qB+qC)*(CcmY*(qB'+qC')^2-CcmZ*(qB''+qC'')-CcmX*
+         (sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(
+         qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))+mC*BoZ*sin(qB+qC)*(CcmY*(
+         qB'+qC')^2-CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'
+         *qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*
+         qA'')))-mC*CcmX*CoY*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-Ci
+         yz*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(
+         sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-Cixy*(cos(qC)*(cos(qB)*
+         qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)
+         *qA'*qC'-cos(qB)*qA''))-mC*CoY*cos(qC)*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX
+         *cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+
+         CcmY*(qB''+qC''))-mC*CoZ*sin(qC)*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(
+         qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+CcmY*(
+         qB''+qC''))-mC*CoZ*cos(qC)*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*
+         qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''+qC
+         ''))-mC*BoZ*cos(qB+qC)*(CcmZ*(qB'+qC')^2+CcmY*(qB''+qC'')+CcmX*(cos(
+         qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*
+         qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*CcmZ*(CcmX*sin(qB+qC)*qA'*(
+         qB'+qC')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''
+         +qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+
+         cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*CcmY*(CcmX
+         *cos(qB+qC)*qA'*(qB'+qC')-sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))
+         *qA'^2-CcmY*(qB''+qC'')-CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'
+         +sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))))
+         - mB*BcmY*g*sin(qB) - mB*BcmZ*g*cos(qB) - mC*CoY*g*sin(qB) - mC*CoZ*g*cos(qB)
+         - mC*CcmZ*g*cos(qB+qC) - cos(qA)*(mA*AcmY*(AcmZ*qA'^2+AcmX*qA'')+mB*
+         BoY*(BoZ*qA'^2+BoX*qA'')+mC*BoY*(BoZ*qA'^2+BoX*qA'')+mC*CcmY*sin(qB+
+         qC)*(BoZ*qA'^2+BoX*qA'')-Aiyz*qA'^2-Aixy*qA''-mB*BcmY*sin(qB)*(BoZ*qA'^2
+         +BoX*qA'')-mB*BcmZ*cos(qB)*(BoZ*qA'^2+BoX*qA'')-mC*CoY*sin(qB)*(BoZ*qA'^2
+         +BoX*qA'')-mC*CoZ*cos(qB)*(BoZ*qA'^2+BoX*qA'')-mC*CcmZ*cos(qB+qC)*(BoZ
+         *qA'^2+BoX*qA'')) - sin(qA)*sin(qB)*(qB'*(Bixy*qB'-2*Bixz*cos(qB)*qA'-
+         Biyy*sin(qB)*qA')+sin(qB)*qA'*(Bixx*qB'-Bixy*sin(qB)*qA'-Biyz*cos(qB)*
+         qA')+Biyz*qB''+mB*BcmY*(BoX*qA'^2-BoZ*qA'')+mC*CoY*(BoX*qA'^2-BoZ*qA'')
+         +Bizz*(sin(qB)*qA'*qB'-cos(qB)*qA'')+mC*CcmX*(CoY*qB'^2+cos(qB)*(CoY*
+         cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')+mC*CoY*(CoX*qA'^2
+         +2*CoY*sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))
+         *qA'')-Bixz*sin(qB)*qA''-mB*BcmX*(BcmY*qB'^2+cos(qB)*(BcmY*cos(qB)-Bc
+         mZ*sin(qB))*qA'^2+BcmZ*qB''+BcmX*cos(qB)*qA'')-mB*BoX*(BcmY*qB'^2+cos(
+         qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2+BcmZ*qB''+BcmX*cos(qB)*qA'')-mC*
+         BoX*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*
+         cos(qB)*qA'')-mC*CoX*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         +CoZ*qB''+CoX*cos(qB)*qA'')-mB*BcmY*(BcmY*cos(qB)*qA''-qA'*(BcmX*qA'+2
+         *BcmY*sin(qB)*qB'+2*BcmZ*cos(qB)*qB')-BcmZ*sin(qB)*qA'')-mC*CoY*(qA'*(
+         CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+CcmY*(
+         sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(
+         qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*qA'*
+         qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'
+         *qC'-cos(qB)*qA'')))) - sin(qA)*cos(qB)*(qB'*(Biyz*qB'-Bizz*cos(qB)*
+         qA')+cos(qB)*qA'*(Bixx*qB'-Bixy*sin(qB)*qA'-Biyz*cos(qB)*qA')+mB*BcmZ*
+         (BoX*qA'^2-BoZ*qA'')+mC*CoZ*(BoX*qA'^2-BoZ*qA'')+Biyy*(cos(qB)*qA'*qB'
+         +sin(qB)*qA'')+mC*CcmX*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         -CoY*qB''-CoX*sin(qB)*qA'')+mC*CoZ*(CoX*qA'^2+2*CoY*sin(qB)*qA'*qB'+2*
+         CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA'')-Bixy*qB''-Bixz*(2*
+         sin(qB)*qA'*qB'-cos(qB)*qA'')-mB*BcmX*(BcmZ*qB'^2-sin(qB)*(BcmY*cos(
+         qB)-BcmZ*sin(qB))*qA'^2-BcmY*qB''-BcmX*sin(qB)*qA'')-mB*BcmZ*(BcmY*cos
+         (qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*cos(qB)*qB')-BcmZ*
+         sin(qB)*qA'')-mB*BoX*(BcmZ*qB'^2-sin(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2
+         -BcmY*qB''-BcmX*sin(qB)*qA'')-mC*BoX*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-
+         CoZ*sin(qB))*qA'^2-CoY*qB''-CoX*sin(qB)*qA'')-mC*CoX*(CoZ*qB'^2-sin(
+         qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2-CoY*qB''-CoX*sin(qB)*qA'')-mC*CoZ*
+         (qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+
+         CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(
+         sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*
+         qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)
+         *qA'*qC'-cos(qB)*qA'')))) - cos(qA)*(mB*BoY*(BcmY*cos(qB)-BcmZ*sin(qB))
+         *qA'^2+mC*BoY*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+mB*BcmX*BoY*qA''+mC*BoY*
+         CoX*qA''+Bixy*sin(qB)*qA''+Biyz*cos(qB)*qA''+mB*BoY*cos(qB)*(BcmY*qB'^2
+         +BcmZ*qB'')+mB*BoZ*sin(qB)*(BcmY*qB'^2+BcmZ*qB'')+mC*BoY*cos(qB)*(CoY*qB'^2
+         +CoZ*qB'')+mC*BoZ*sin(qB)*(CoY*qB'^2+CoZ*qB'')+mB*BoZ*cos(qB)*(BcmZ*qB'^2
+         -BcmY*qB'')+mC*BoZ*cos(qB)*(CoZ*qB'^2-CoY*qB'')+mC*CcmY*sin(qC)*(CoY*qB'^2
+         +cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')-(
+         sin(qB)*(Bixz*sin(qB)+Bizz*cos(qB))-cos(qB)*(Bixz*cos(qB)+Biyy*sin(qB)))
+         *qA'^2-Bixx*qB''-mB*BoY*sin(qB)*(BcmZ*qB'^2-BcmY*qB'')-mC*BoY*sin(qB)*
+         (CoZ*qB'^2-CoY*qB'')-mB*BcmY*(sin(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2
+         +BcmY*qB''+BcmX*sin(qB)*qA'')-mB*BcmZ*(cos(qB)*(BcmY*cos(qB)-BcmZ*sin(
+         qB))*qA'^2+BcmZ*qB''+BcmX*cos(qB)*qA'')-mC*CoY*(sin(qB)*(CoY*cos(qB)-
+         CoZ*sin(qB))*qA'^2+CoY*qB''+CoX*sin(qB)*qA'')-mC*CoZ*(cos(qB)*(CoY*cos
+         (qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')-mC*CcmZ*cos(qC)*(
+         CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)
+         *qA'')-mC*CcmY*cos(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         -CoY*qB''-CoX*sin(qB)*qA'')-mC*CcmZ*sin(qC)*(CoZ*qB'^2-sin(qB)*(CoY*
+         cos(qB)-CoZ*sin(qB))*qA'^2-CoY*qB''-CoX*sin(qB)*qA'')) - sin(qA)*cos(
+         qB+qC)*((qB'+qC')*(Cixz*sin(qB+qC)*qA'-Ciyz*(qB'+qC')-Cizz*cos(qB+qC)*
+         qA')+mC*CcmZ*(BoX*qA'^2-BoZ*qA'')+mC*CcmZ*(CoX*qA'^2+2*CoY*sin(qB)*qA'
+         *qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA'')+Cixz*(sin(
+         qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*
+         qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))+Ciyy*(cos(qC)*(cos(qB)*qA'*qB'+
+         cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'
+         -cos(qB)*qA''))+mC*CcmX*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')
+         +sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+CcmY*(qB''+qC'')+
+         CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(
+         sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-cos(qB+qC)*qA'*(Cixy*
+         sin(qB+qC)*qA'-Cixx*(qB'+qC')-Ciyz*cos(qB+qC)*qA')-Cixy*(qB''+qC'')-
+         mC*BoX*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(Cc
+         mY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(
+         cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'
+         +sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*CoX*((qB'+qC')*(CcmZ*(qB'+qC')-Cc
+         mX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+
+         CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(
+         qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*
+         CcmZ*(qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))
+         +CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*
+         (sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)
+         *qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(
+         qB)*qA'*qC'-cos(qB)*qA''))))
+
+-> (161) Tz = sin(qA)*(mA*AcmY*(AcmZ*qA'^2+AcmX*qA'')+mB*BoY*(BoZ*qA'^2+BoX*qA
+         '')+mC*BoY*(BoZ*qA'^2+BoX*qA'')+mC*CcmY*sin(qB+qC)*(BoZ*qA'^2+BoX*qA'')
+         -Aiyz*qA'^2-Aixy*qA''-mB*BcmY*sin(qB)*(BoZ*qA'^2+BoX*qA'')-mB*BcmZ*cos
+         (qB)*(BoZ*qA'^2+BoX*qA'')-mC*CoY*sin(qB)*(BoZ*qA'^2+BoX*qA'')-mC*CoZ*
+         cos(qB)*(BoZ*qA'^2+BoX*qA'')-mC*CcmZ*cos(qB+qC)*(BoZ*qA'^2+BoX*qA''))
+         + cos(qA)*(Aiyz*qA''+mA*AcmY*(AcmX*qA'^2-AcmZ*qA'')+mB*BoY*(BoX*qA'^2-
+         BoZ*qA'')+mC*BoY*(BoX*qA'^2-BoZ*qA'')+mC*BoY*(CoX*qA'^2+2*CoY*sin(qB)*
+         qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA'')-Aixy*qA'^2
+         -mB*BoY*(BcmY*cos(qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*cos
+         (qB)*qB')-BcmZ*sin(qB)*qA'')-mC*BoY*(qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(
+         qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos
+         (qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-
+         cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*
+         qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))) + sin(
+         qA)*(mB*BoY*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2+mC*BoY*(CoY*cos(qB)-CoZ*
+         sin(qB))*qA'^2+mB*BcmX*BoY*qA''+mC*BoY*CoX*qA''+Bixy*sin(qB)*qA''+Biyz
+         *cos(qB)*qA''+mB*BoY*cos(qB)*(BcmY*qB'^2+BcmZ*qB'')+mB*BoZ*sin(qB)*(
+         BcmY*qB'^2+BcmZ*qB'')+mC*BoY*cos(qB)*(CoY*qB'^2+CoZ*qB'')+mC*BoZ*sin(
+         qB)*(CoY*qB'^2+CoZ*qB'')+mB*BoZ*cos(qB)*(BcmZ*qB'^2-BcmY*qB'')+mC*BoZ*
+         cos(qB)*(CoZ*qB'^2-CoY*qB'')+mC*CcmY*sin(qC)*(CoY*qB'^2+cos(qB)*(CoY*
+         cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')-(sin(qB)*(Bixz*
+         sin(qB)+Bizz*cos(qB))-cos(qB)*(Bixz*cos(qB)+Biyy*sin(qB)))*qA'^2-Bixx*
+         qB''-mB*BoY*sin(qB)*(BcmZ*qB'^2-BcmY*qB'')-mC*BoY*sin(qB)*(CoZ*qB'^2-
+         CoY*qB'')-mB*BcmY*(sin(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2+BcmY*qB''
+         +BcmX*sin(qB)*qA'')-mB*BcmZ*(cos(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2
+         +BcmZ*qB''+BcmX*cos(qB)*qA'')-mC*CoY*(sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))
+         *qA'^2+CoY*qB''+CoX*sin(qB)*qA'')-mC*CoZ*(cos(qB)*(CoY*cos(qB)-CoZ*sin
+         (qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')-mC*CcmZ*cos(qC)*(CoY*qB'^2+cos(
+         qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')-mC*CcmY
+         *cos(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2-CoY*qB''-
+         CoX*sin(qB)*qA'')-mC*CcmZ*sin(qC)*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*
+         sin(qB))*qA'^2-CoY*qB''-CoX*sin(qB)*qA'')) + cos(qA)*sin(qB+qC)*(sin(
+         qB+qC)*qA'*(Cixy*sin(qB+qC)*qA'-Cixx*(qB'+qC')-Ciyz*cos(qB+qC)*qA')+
+         Ciyz*(qB''+qC'')+mC*CcmY*(BoX*qA'^2-BoZ*qA'')+mC*CcmY*(CoX*qA'^2+2*CoY
+         *sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA'')
+         +mC*CcmX*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(
+         CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''+qC'')-CcmX*(sin(qC)*
+         (cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*
+         qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-(qB'+qC')*(Cixy*(qB'+qC')+Cixz*cos
+         (qB+qC)*qA'-Ciyy*sin(qB+qC)*qA')-Cizz*(sin(qC)*(cos(qB)*qA'*qB'+cos(
+         qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos
+         (qB)*qA''))-Cixz*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA
+         '')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-mC*BoX*((
+         qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+
+         qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'
+         *qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*
+         qA'*qC'-cos(qB)*qA'')))-mC*CoX*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*sin(qB+
+         qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmZ*(qB''
+         +qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+
+         cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*CcmY*(qA'*
+         (CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+CcmY*(
+         sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(
+         qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*qA'*
+         qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'
+         *qC'-cos(qB)*qA'')))) - sin(qB)*cos(qA)*(qB'*(Bixy*qB'-2*Bixz*cos(qB)*
+         qA'-Biyy*sin(qB)*qA')+sin(qB)*qA'*(Bixx*qB'-Bixy*sin(qB)*qA'-Biyz*cos(
+         qB)*qA')+Biyz*qB''+mB*BcmY*(BoX*qA'^2-BoZ*qA'')+mC*CoY*(BoX*qA'^2-BoZ*
+         qA'')+Bizz*(sin(qB)*qA'*qB'-cos(qB)*qA'')+mC*CcmX*(CoY*qB'^2+cos(qB)*(
+         CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*cos(qB)*qA'')+mC*CoY*(CoX*qA'^2
+         +2*CoY*sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))
+         *qA'')-Bixz*sin(qB)*qA''-mB*BcmX*(BcmY*qB'^2+cos(qB)*(BcmY*cos(qB)-Bc
+         mZ*sin(qB))*qA'^2+BcmZ*qB''+BcmX*cos(qB)*qA'')-mB*BoX*(BcmY*qB'^2+cos(
+         qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2+BcmZ*qB''+BcmX*cos(qB)*qA'')-mC*
+         BoX*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2+CoZ*qB''+CoX*
+         cos(qB)*qA'')-mC*CoX*(CoY*qB'^2+cos(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         +CoZ*qB''+CoX*cos(qB)*qA'')-mB*BcmY*(BcmY*cos(qB)*qA''-qA'*(BcmX*qA'+2
+         *BcmY*sin(qB)*qB'+2*BcmZ*cos(qB)*qB')-BcmZ*sin(qB)*qA'')-mC*CoY*(qA'*(
+         CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+CcmY*(
+         sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(
+         qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*qA'*
+         qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'
+         *qC'-cos(qB)*qA'')))) - cos(qA)*cos(qB)*(qB'*(Biyz*qB'-Bizz*cos(qB)*
+         qA')+cos(qB)*qA'*(Bixx*qB'-Bixy*sin(qB)*qA'-Biyz*cos(qB)*qA')+mB*BcmZ*
+         (BoX*qA'^2-BoZ*qA'')+mC*CoZ*(BoX*qA'^2-BoZ*qA'')+Biyy*(cos(qB)*qA'*qB'
+         +sin(qB)*qA'')+mC*CcmX*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2
+         -CoY*qB''-CoX*sin(qB)*qA'')+mC*CoZ*(CoX*qA'^2+2*CoY*sin(qB)*qA'*qB'+2*
+         CoZ*cos(qB)*qA'*qB'-(CoY*cos(qB)-CoZ*sin(qB))*qA'')-Bixy*qB''-Bixz*(2*
+         sin(qB)*qA'*qB'-cos(qB)*qA'')-mB*BcmX*(BcmZ*qB'^2-sin(qB)*(BcmY*cos(
+         qB)-BcmZ*sin(qB))*qA'^2-BcmY*qB''-BcmX*sin(qB)*qA'')-mB*BcmZ*(BcmY*cos
+         (qB)*qA''-qA'*(BcmX*qA'+2*BcmY*sin(qB)*qB'+2*BcmZ*cos(qB)*qB')-BcmZ*
+         sin(qB)*qA'')-mB*BoX*(BcmZ*qB'^2-sin(qB)*(BcmY*cos(qB)-BcmZ*sin(qB))*qA'^2
+         -BcmY*qB''-BcmX*sin(qB)*qA'')-mC*BoX*(CoZ*qB'^2-sin(qB)*(CoY*cos(qB)-
+         CoZ*sin(qB))*qA'^2-CoY*qB''-CoX*sin(qB)*qA'')-mC*CoX*(CoZ*qB'^2-sin(
+         qB)*(CoY*cos(qB)-CoZ*sin(qB))*qA'^2-CoY*qB''-CoX*sin(qB)*qA'')-mC*CoZ*
+         (qA'*(CcmX*qA'+CcmY*sin(qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+
+         CcmY*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(
+         sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*
+         qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)
+         *qA'*qC'-cos(qB)*qA'')))) - cos(qA)*cos(qB+qC)*((qB'+qC')*(Cixz*sin(
+         qB+qC)*qA'-Ciyz*(qB'+qC')-Cizz*cos(qB+qC)*qA')+mC*CcmZ*(BoX*qA'^2-BoZ*
+         qA'')+mC*CcmZ*(CoX*qA'^2+2*CoY*sin(qB)*qA'*qB'+2*CoZ*cos(qB)*qA'*qB'-(
+         CoY*cos(qB)-CoZ*sin(qB))*qA'')+Cixz*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*
+         qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)
+         *qA''))+Ciyy*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-
+         sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))+mC*CcmX*((qB'+
+         qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+
+         CcmZ*sin(qB+qC))*qA'^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*qA'*qB'
+         +cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*
+         qC'-cos(qB)*qA'')))-cos(qB+qC)*qA'*(Cixy*sin(qB+qC)*qA'-Cixx*(qB'+qC')
+         -Ciyz*cos(qB+qC)*qA')-Cixy*(qB''+qC'')-mC*BoX*((qB'+qC')*(CcmZ*(qB'+
+         qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))
+         *qA'^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'
+         +sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))
+         -mC*CoX*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(
+         CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+CcmY*(qB''+qC'')+CcmX*(cos(qC)*
+         (cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*
+         qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*CcmZ*(qA'*(CcmX*qA'+CcmY*sin(
+         qB+qC)*(qB'+qC')-CcmZ*cos(qB+qC)*(qB'+qC'))+CcmY*(sin(qC)*(cos(qB)*qA'
+         *qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*
+         qA'*qC'-cos(qB)*qA''))-CcmZ*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+
+         sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))))
+         - sin(qA)*(mC*BoZ*CcmX*qA'*(qB'+qC')+mC*BoY*(CcmY*cos(qB+qC)+CcmZ*sin(
+         qB+qC))*qA'^2+qA'*(cos(qB+qC)*(Cixy*(qB'+qC')+Cixz*cos(qB+qC)*qA'-Ciyy
+         *sin(qB+qC)*qA')-sin(qB+qC)*(Cixz*sin(qB+qC)*qA'-Ciyz*(qB'+qC')-Cizz*
+         cos(qB+qC)*qA'))+Cixx*(qB''+qC'')+mC*CcmX*CoZ*(sin(qB)*qA'*qB'+sin(qB)
+         *qA'*qC'-cos(qB)*qA'')+mC*CoY*sin(qC)*((qB'+qC')*(CcmY*(qB'+qC')+CcmX*
+         sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-Cc
+         mZ*(qB''+qC''))+mC*BoY*sin(qB+qC)*(CcmZ*(qB'+qC')^2+CcmY*(qB''+qC'')+
+         CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(
+         sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))+mC*BoY*cos(qB+qC)*(Cc
+         mY*(qB'+qC')^2-CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(qB)
+         *qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(
+         qB)*qA'')))+mC*BoZ*sin(qB+qC)*(CcmY*(qB'+qC')^2-CcmZ*(qB''+qC'')-CcmX*
+         (sin(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(
+         qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*CcmX*CoY*(cos(qB)*qA'*
+         qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-Ciyz*(sin(qC)*(cos(qB)*qA'*qB'+cos(
+         qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos
+         (qB)*qA''))-Cixy*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA
+         '')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA''))-mC*CoY*cos
+         (qC)*((qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*
+         cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2+CcmY*(qB''+qC''))-mC*CoZ*sin(qC)*((
+         qB'+qC')*(CcmZ*(qB'+qC')-CcmX*cos(qB+qC)*qA')+sin(qB+qC)*(CcmY*cos(qB+
+         qC)+CcmZ*sin(qB+qC))*qA'^2+CcmY*(qB''+qC''))-mC*CoZ*cos(qC)*((qB'+qC')
+         *(CcmY*(qB'+qC')+CcmX*sin(qB+qC)*qA')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ
+         *sin(qB+qC))*qA'^2-CcmZ*(qB''+qC''))-mC*BoZ*cos(qB+qC)*(CcmZ*(qB'+qC')^2
+         +CcmY*(qB''+qC'')+CcmX*(cos(qC)*(cos(qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(
+         qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos(qB)*qA'')))-mC*
+         CcmZ*(CcmX*sin(qB+qC)*qA'*(qB'+qC')+cos(qB+qC)*(CcmY*cos(qB+qC)+CcmZ*
+         sin(qB+qC))*qA'^2-CcmZ*(qB''+qC'')-CcmX*(sin(qC)*(cos(qB)*qA'*qB'+cos(
+         qB)*qA'*qC'+sin(qB)*qA'')+cos(qC)*(sin(qB)*qA'*qB'+sin(qB)*qA'*qC'-cos
+         (qB)*qA'')))-mC*CcmY*(CcmX*cos(qB+qC)*qA'*(qB'+qC')-sin(qB+qC)*(CcmY*
+         cos(qB+qC)+CcmZ*sin(qB+qC))*qA'^2-CcmY*(qB''+qC'')-CcmX*(cos(qC)*(cos(
+         qB)*qA'*qB'+cos(qB)*qA'*qC'+sin(qB)*qA'')-sin(qC)*(sin(qB)*qA'*qB'+sin
+         (qB)*qA'*qC'-cos(qB)*qA''))))
+
+   (162) 

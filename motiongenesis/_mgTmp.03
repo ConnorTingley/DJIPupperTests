@@ -1,54 +1,38 @@
 NewtonianFrame N
 RigidBody A,B,C
 RigidFrame Arot, Brot, Crot, Arot2
-
 Variable qA'', qB'', qC''
 Variable TA, TB, TC
 Variable Fx, Fy, Fz, Tx, Ty, Tz
-
 Point foot(C)
-
 Constant g = 9.81 m/s^2
-
-
 %--------------------------------------------
 % Mass and Inertia
-
 A.SetMass(mA = 0.142 kg)
 B.SetMass(mB = 0.106 kg)
 C.SetMass(mC = 0.038 kg)
-
 A.SetInertia(Acm, Aixx=0.00014 kg*meter^2, Aiyy=0.00016 kg*meter^2, Aizz=3e-05 kg*meter^2, Aixy=0 kg*meter^2, Aiyz=0 kg*meter^2, Aixz=0 kg*meter^2)
 B.SetInertia(Bcm, Bixx=2e-05 kg*meter^2, Biyy=6e-05 kg*meter^2, Bizz=6e-05 kg*meter^2, Bixy=0 kg*meter^2, Bixz=0 kg*meter^2, Biyz=0 kg*meter^2)
 C.SetInertia(Ccm, Cixx=0.00018 kg*meter^2, Ciyy=0.00018 kg*meter^2, Cizz=2e-05 kg*meter^2, Cixy=0 kg*meter^2, Cixz=0 kg*meter^2, Ciyz=0 kg*meter^2)
-
 %A.SetMass(0.142)
 %B.SetMass(0.106)
 %C.SetMass(0.038)
-
 %A.SetInertia(Acm, 0.00014, 0.00016, 3e-05, 0, 0, 0)
 %B.SetInertia(Bcm, 2e-05, 6e-05, 6e-05, 0, 0, 0)
 %C.SetInertia(Ccm, 0.00018, 0.00018, 2e-05, 0, 0, 0)
-
 %--------------------------------------------
 % Rotations
-
 %Arot.RotatePositiveX(N, PI/2)
 %Arot2.RotateNegativeY(Arot, PI/2)
 %A.RotateNegativeY( Arot2, qA )
-
 Arot.RotatePositiveZ(N, PI/2)
 A.RotatePositiveY( Arot, qA )
-
 Brot.RotatePositiveX(A, PI/2)
 B.RotatePositiveX( Brot, qB )
-
 Crot.RotatePositiveZ(B, PI)
 C.RotateNegativeX( Crot, qC )
-
 %--------------------------------------------
 % Positions
-
 Constant AcmX = 0.0139 m
 Constant AcmY = 0.0254 m
 Constant AcmZ = 0 m
@@ -67,62 +51,36 @@ Constant CcmZ = -0.0658 m
 Constant footX = 0.002 m
 Constant footY = 0 m
 Constant footZ = -0.11 m
-
 Ao.Translate(No, 0>)
 Acm.Translate(Ao, AcmX * Ax> + AcmY * Ay> + AcmZ * Az>)
-
 Bo.Translate(Ao, BoX * Ax> + BoY * Ay> + BoZ * Az>)
 Bcm.Translate(Bo, BcmX * Bx> + BcmY * By> + BcmZ * Bz>)
-
 Co.Translate(Bo, CoX * Bx> + CoY * By> + CoZ * Bz>)
 Ccm.Translate(Co, CcmX * Cx> + CcmY * Cy> + CcmZ * Cz>)
-
 foot.Translate(Co, footX * Cx> + footY * Cy> + footZ * Cz>)
-
 %-------------------------------------------- 
 % Forces and Torques
-
 System.AddForceGravity( -g*Nz> )
-
 Ao.AddForce(Fx * Nx> + Fy * Ny> + Fz * Nz>)
 A.AddTorque(Ty * Ny> + Tz * Nz>)
-
 A.AddTorque(N, TA * Ay>)
 B.AddTorque(A, TB * Bx>)
 C.AddTorque(B, -TC * Cx>)
-
 %-------------------------------------------- 
 % Dynamics
-
 SetGeneralizedSpeed(qA', qB', qC')
-
-%Dynamics = System.GetDynamicsKane()
-
-Motors[1] = Dot(C.GetDynamics(Co), Cx>)
-Motors[2] = Dot(System(B,C).GetDynamics(Bo), Bx>)
-Motors[3] = Dot(System.GetDynamics(Ao), Ay>)
-
+Motors = System.GetDynamicsKane()
 %Dynamics[4] = Dot(System.GetDynamics(Ao), Nx>)
 Dynamics[1] = Dot(System.GetDynamics(Ao), Ny>)
 Dynamics[2] = Dot(System.GetDynamics(Ao), Nz>)
 Dynamics[3] = Dot(System.GetDynamics(), Nx>)
 Dynamics[4] = Dot(System.GetDynamics(), Ny>)
 Dynamics[5] = Dot(System.GetDynamics(), Nz>)
-
 %-------------------------------------------- 
 % Position Check
-
 footPos> = foot.GetPosition( No )
-EvaluateToNumber(Evaluate(Dot(footPos>, Nx>),qA = 0.397, qB = -0.430, qC = -1.554))
-EvaluateToNumber(Evaluate(Dot(footPos>, Ny>),qA = 0.397, qB = -0.430, qC = -1.554))
-EvaluateToNumber(Evaluate(Dot(footPos>, Nz>),qA = 0.397, qB = -0.430, qC = -1.554))
-
 %-------------------------------------------- 
 % Solve
-
 Tx = -TA
-
 Solve( Motors = 0, qA'', qB'', qC'')
 Solve( Dynamics = 0, Fx, Fy, Fz, Ty, Tz)
-
-
