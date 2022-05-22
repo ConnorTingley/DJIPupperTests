@@ -8,7 +8,7 @@
 #include "Utils.h"
 
 BLA::Matrix<3> shift;
-Ki = 1;
+float Ki = 1;
 
 DriveSystem::DriveSystem() : front_bus_(), rear_bus_() {
   control_mode_ = DriveControlMode::kIdle;
@@ -194,26 +194,25 @@ void DriveSystem::SetMaxCurrent(float max_current) {
 }
 
 BLA::Matrix<3> Cross(BLA::Matrix<3> a, BLA::Matrix<3> b){
-  BLA::Matrix<3> v
-  v = {a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]}
+  BLA::Matrix<3> v;
+  v = {a(1) * b(2) - a(2) * b(1), a(2) * b(0) - a(0) * b(2), a(0) * b(1) - a(1) * b(0)};
   return v;
 }
 
-BLA::Matrix<12> KickbackForces(){
+/*BLA::Matrix<12> KickbackForces(){
   BLA::Matrix<3, 3> jac =
-}
+}*/
 
 void ShiftingUpdate(int leg_index, BLA::Matrix<3> measured_hip_relative_positions, BLA::Matrix<3> reference_hip_relative_positions){
   BLA::Matrix<3> pos_diff = reference_hip_relative_positions - measured_hip_relative_positions;
   BLA::Matrix<3> measured_absolute_positions = measured_hip_relative_positions + HipPosition(hip_layout_parameters_, leg_index);
 
-  BLA::Matrix<3> cm_guess = {x_shift, y_shift,0};
-  BLA::Matrix<3> r_cm_relative = measured_absolute_positions - cm_guess;
+  BLA::Matrix<3> r_cm_relative = measured_absolute_positions - shift;
   
   BLA::Matrix<3> moment = Cross(r_cm_relative, pos_diff);
 
-  shift[0] += Ki * moment[1];
-  shift[1] -= Ki * moment[0];
+  shift(0) += Ki * moment(1);
+  shift(1) -= Ki * moment(0);
 }
 
 BLA::Matrix<12> DriveSystem::CartesianPositionControl() {
