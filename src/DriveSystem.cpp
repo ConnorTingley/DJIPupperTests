@@ -3,7 +3,12 @@
 #include <ArduinoJson.h>
 #include <Streaming.h>
 
+#include "Kinematics.h"
+
 #include "Utils.h"
+
+BLA::Matrix<3> shift;
+Ki = 1;
 
 DriveSystem::DriveSystem() : front_bus_(), rear_bus_() {
   control_mode_ = DriveControlMode::kIdle;
@@ -188,6 +193,29 @@ void DriveSystem::SetMaxCurrent(float max_current) {
   max_current_ = max_current;
 }
 
+BLA::Matrix<3> Cross(BLA::Matrix<3> a, BLA::Matrix<3> b){
+  BLA::Matrix<3> v
+  v = {a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]}
+  return v;
+}
+
+BLA::Matrix<12> KickbackForces(){
+  BLA::Matrix<3, 3> jac =
+}
+
+void ShiftingUpdate(int leg_index, BLA::Matrix<3> measured_hip_relative_positions, BLA::Matrix<3> reference_hip_relative_positions){
+  BLA::Matrix<3> pos_diff = reference_hip_relative_positions - measured_hip_relative_positions;
+  BLA::Matrix<3> measured_absolute_positions = measured_hip_relative_positions + HipPosition(hip_layout_parameters_, leg_index);
+
+  BLA::Matrix<3> cm_guess = {x_shift, y_shift,0};
+  BLA::Matrix<3> r_cm_relative = measured_absolute_positions - cm_guess;
+  
+  BLA::Matrix<3> moment = Cross(r_cm_relative, pos_diff);
+
+  shift[0] += Ki * moment[1];
+  shift[1] -= Ki * moment[0];
+}
+
 BLA::Matrix<12> DriveSystem::CartesianPositionControl() {
   BLA::Matrix<12> actuator_torques;
   for (int leg_index = 0; leg_index < 4; leg_index++) {
@@ -201,7 +229,7 @@ BLA::Matrix<12> DriveSystem::CartesianPositionControl() {
     auto measured_velocities = jac * joint_velocities;
     auto reference_hip_relative_positions =
         LegCartesianPositionReference(leg_index) -
-        HipPosition(hip_layout_parameters_, leg_index);
+        HipPosition(hip_layout_parameters_, leg_index) + shift;
     auto reference_velocities = LegCartesianVelocityReference(leg_index);
 
     auto cartesian_forces =
@@ -223,6 +251,8 @@ BLA::Matrix<12> DriveSystem::CartesianPositionControl() {
     actuator_torques(3 * leg_index) = joint_torques(0);
     actuator_torques(3 * leg_index + 1) = joint_torques(1);
     actuator_torques(3 * leg_index + 2) = joint_torques(2) + knee_constraint_torque;
+
+    ShiftingUpdate(leg_index, measured_hip_relative_positions, reference_hip_relative_positions);
   }
   return actuator_torques;
 }
