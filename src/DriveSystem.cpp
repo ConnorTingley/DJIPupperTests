@@ -7,9 +7,6 @@
 
 #include "Utils.h"
 
-BLA::Matrix<3> shift;
-float Ki = 1;
-
 DriveSystem::DriveSystem() : front_bus_(), rear_bus_() {
   control_mode_ = DriveControlMode::kIdle;
   fault_current_ = 10.0;  // TODO: don't make this so high at default
@@ -30,6 +27,8 @@ DriveSystem::DriveSystem() : front_bus_(), rear_bus_() {
   std::array<float, 12> direction_multipliers = {-1, -1, 1, -1, 1, -1,
                                                  -1, -1, 1, -1, 1, -1};
   direction_multipliers_ = direction_multipliers;
+
+  shift = {0,0,0};
 
   /*  Homing parameters begin */
   // float abduction_homed_position = 0.8384160301;
@@ -203,7 +202,7 @@ BLA::Matrix<3> Cross(BLA::Matrix<3> a, BLA::Matrix<3> b){
   BLA::Matrix<3, 3> jac =
 }*/
 
-void ShiftingUpdate(int leg_index, BLA::Matrix<3> measured_hip_relative_positions, BLA::Matrix<3> reference_hip_relative_positions){
+void DriveSystem::ShiftingUpdate(int leg_index, BLA::Matrix<3> measured_hip_relative_positions, BLA::Matrix<3> reference_hip_relative_positions){
   BLA::Matrix<3> pos_diff = reference_hip_relative_positions - measured_hip_relative_positions;
   BLA::Matrix<3> measured_absolute_positions = measured_hip_relative_positions + HipPosition(hip_layout_parameters_, leg_index);
 

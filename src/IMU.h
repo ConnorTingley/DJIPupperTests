@@ -2,7 +2,7 @@
 
 #include <BasicLinearAlgebra.h>
 #include <MahonyAHRS.h>
-#include "ICM_20948.h"
+#include <Adafruit_ICM20948.h>
 
 #include <Adafruit_ICM20X.h>
 #include <Adafruit_ICM20649.h>
