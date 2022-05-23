@@ -149,6 +149,8 @@ class DriveSystem {
 
   BLA::Matrix<3> shift = {0,0,0};
   float Ki = 1;
+  float xShiftLimit = 0.14;
+  float yShiftLimit = 0.08;
   // Perform integral control over xshift and yshift
   void ShiftingUpdate(int leg_index, BLA::Matrix<3> measured_hip_relative_positions, BLA::Matrix<3> reference_hip_relative_positions);
 

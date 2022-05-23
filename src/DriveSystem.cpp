@@ -204,6 +204,9 @@ BLA::Matrix<3> Cross(BLA::Matrix<3> a, BLA::Matrix<3> b){
 
 void DriveSystem::ShiftingUpdate(int leg_index, BLA::Matrix<3> measured_hip_relative_positions, BLA::Matrix<3> reference_hip_relative_positions){
   BLA::Matrix<3> pos_diff = reference_hip_relative_positions - measured_hip_relative_positions;
+  pos_diff(1) = 0; //Only consider upward forces
+  pos_diff(2) = 0;
+
   BLA::Matrix<3> measured_absolute_positions = measured_hip_relative_positions + HipPosition(hip_layout_parameters_, leg_index);
 
   BLA::Matrix<3> r_cm_relative = measured_absolute_positions - shift;
@@ -212,6 +215,19 @@ void DriveSystem::ShiftingUpdate(int leg_index, BLA::Matrix<3> measured_hip_rela
 
   shift(0) += Ki * moment(1);
   shift(1) -= Ki * moment(0);
+
+  if (shift(0) > xShiftLimit){
+    shift(0) = xShiftLimit;
+  }
+  if (shift(0) < -xShiftLimit){
+    shift(0) = -xShiftLimit;
+  }
+  if (shift(1) > yShiftLimit){
+    shift(1) = yShiftLimit;
+  }
+  if (shift(1) < -yShiftLimit){
+    shift(1) = -yShiftLimit;
+  }
 }
 
 BLA::Matrix<12> DriveSystem::CartesianPositionControl() {
