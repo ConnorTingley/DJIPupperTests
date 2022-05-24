@@ -116,9 +116,9 @@ class DriveSystem {
   // Angular velocity in radians/timestep for homing
   float homing_velocity = 0.0005;
 
-  int cartesian_start_time = -1;
-  int ramp_up_time = 1000000;//millis
-
+  float last_current;
+  float last_current_time;
+  float current_per_s = 100000;
 
   // Axes grouped into different phases of the homing sequence
   std::array<int, 4> knee_axes_;
@@ -152,7 +152,7 @@ class DriveSystem {
 
   float RampUpLimiter();
 
-  BLA::Matrix<12> FeedForwardGravity(BLA::Matrix<12> all_measured_hip_relative_positions);
+  BLA::Matrix<4> FeedForwardGravity(BLA::Matrix<3> all_measured_hip_relative_positions[]);
 
   // Calculate motor torques for cartesian position control
   BLA::Matrix<12> CartesianPositionControl();
