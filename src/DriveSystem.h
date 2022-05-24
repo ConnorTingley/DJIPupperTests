@@ -116,6 +116,10 @@ class DriveSystem {
   // Angular velocity in radians/timestep for homing
   float homing_velocity = 0.0005;
 
+  int cartesian_start_time = -1;
+  int ramp_up_time = 1000000;//millis
+
+
   // Axes grouped into different phases of the homing sequence
   std::array<int, 4> knee_axes_;
   std::array<int, 4> hip_axes_;
@@ -145,6 +149,8 @@ class DriveSystem {
 
   void SetupIMU(int filter_frequency);
   void UpdateIMU();
+
+  float RampUpLimiter();
 
   BLA::Matrix<12> FeedForwardGravity(BLA::Matrix<12> all_measured_hip_relative_positions);
 
