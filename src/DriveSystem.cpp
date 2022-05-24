@@ -200,69 +200,27 @@ BLA::Matrix<3> Cross(BLA::Matrix<3> a, BLA::Matrix<3> b){
   BLA::Matrix<3, 3> jac =
 }*/
 
-BLA::Matrix<4> DriveSystem::FeedForwardGravity(BLA::Matrix<3> all_measured_hip_relative_positions[]){
-  BLA::Matrix<4> f_f_gravity = {0,0,0,0};
-  int x_signs[4] = {1, 1, -1, -1};
-  int y_signs[4] = {-1, 1, -1, 1};
-  int x_index[4] = {0, 0, 1, 1};
-  int y_index[4] = {1, 0, 1, 0};
-
-  float x_dis[2] = {0,0};
-  float y_dis[2] = {0,0};
-
-  for (int leg_index = 0; leg_index < 4; leg_index++) {
-    BLA::Matrix<3> measured_absolute_positions = all_measured_hip_relative_positions[leg_index];
-    measured_absolute_positions += HipPosition(hip_layout_parameters_, leg_index);
-    x_dis[x_index[leg_index]] += x_signs[leg_index] * measured_absolute_positions(0);
-    y_dis[y_index[leg_index]] += y_signs[leg_index] * measured_absolute_positions(1);
-  } 
-  float totalForce = 1 * 9.8;
-  int x_sum = x_dis[0] + x_dis[1];
-  int y_sum = y_dis[0] + y_dis[1];
-
-  for (int leg_index = 0; leg_index < 4; leg_index++) {
-    int force_ratio = ((x_sum - x_dis[x_index[leg_index]]) / x_sum + (y_sum - y_dis[y_index[leg_index]]) / y_sum)/4;
-    f_f_gravity(leg_index) = -force_ratio * totalForce;
-  } 
-  return f_f_gravity;
-}
-
 BLA::Matrix<12> DriveSystem::CartesianPositionControl() {
   BLA::Matrix<12> actuator_torques;
-  BLA::Matrix<3> all_measured_hip_relative_positions[4];
-  BLA::Matrix<3> all_joint_angles[4];
   for (int leg_index = 0; leg_index < 4; leg_index++) {
     auto joint_angles = LegJointAngles(leg_index);
-
-    auto measured_hip_relative_positions =
-        ForwardKinematics(joint_angles, leg_parameters_, leg_index);
-
-    all_measured_hip_relative_positions[leg_index] = measured_hip_relative_positions;
-    all_joint_angles[leg_index] = joint_angles;
-  }
-
-  auto f_f_gravity = FeedForwardGravity(all_measured_hip_relative_positions);
-  
-  for (int leg_index = 0; leg_index < 4; leg_index++) {
-    auto joint_angles = LegJointAngles(leg_index);
-    BLA::Matrix<3> measured_hip_relative_positions = all_measured_hip_relative_positions[leg_index];
-
     auto joint_velocities = LegJointVelocities(leg_index);
     BLA::Matrix<3, 3> jac =
         LegJacobian(joint_angles, leg_parameters_, leg_index);
+
+    auto measured_hip_relative_positions =
+        ForwardKinematics(joint_angles, leg_parameters_, leg_index);
     auto measured_velocities = jac * joint_velocities;
     auto reference_hip_relative_positions =
         LegCartesianPositionReference(leg_index) -
         HipPosition(hip_layout_parameters_, leg_index);
     auto reference_velocities = LegCartesianVelocityReference(leg_index);
 
-    BLA::Matrix<3> gravity_mask = {0,0,1};
-
     auto cartesian_forces =
         PDControl3(measured_hip_relative_positions, measured_velocities,
                    reference_hip_relative_positions, reference_velocities,
                    cartesian_position_gains_) +
-        LegFeedForwardForce(leg_index);// + gravity_mask * f_f_gravity(leg_index);
+        LegFeedForwardForce(leg_index);
     auto knee_angle = joint_angles(2);
     auto knee_constraint_torque = (knee_angle > knee_soft_limit) ? position_gains_.kp * (knee_soft_limit - knee_angle) : 0.0;
     auto joint_torques = ~jac * cartesian_forces;
@@ -282,7 +240,7 @@ BLA::Matrix<12> DriveSystem::CartesianPositionControl() {
       joint_torques = joint_torques * max_current_this_step / norm;
       last_current = max_current_this_step;
     }else{
-      last_current = norm;
+      //last_current = norm;
     }
 
     actuator_torques(3 * leg_index) = joint_torques(0);

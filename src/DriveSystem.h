@@ -119,7 +119,6 @@ class DriveSystem {
   float last_current;
   float last_current_time;
   float current_per_s = 100000;
-
   // Axes grouped into different phases of the homing sequence
   std::array<int, 4> knee_axes_;
   std::array<int, 4> hip_axes_;
@@ -151,8 +150,6 @@ class DriveSystem {
   void UpdateIMU();
 
   float RampUpLimiter();
-
-  BLA::Matrix<4> FeedForwardGravity(BLA::Matrix<3> all_measured_hip_relative_positions[]);
 
   // Calculate motor torques for cartesian position control
   BLA::Matrix<12> CartesianPositionControl();
