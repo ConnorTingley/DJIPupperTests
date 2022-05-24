@@ -148,7 +148,7 @@ class DriveSystem {
 
 
   BLA::Matrix<3> shift = {0,0,0};
-  float Ki = 1;
+  float Ki = 0.04;
   float xShiftLimit = 0.14;
   float yShiftLimit = 0.08;
   // Perform integral control over xshift and yshift

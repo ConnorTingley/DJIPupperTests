@@ -13,7 +13,7 @@ const int HEADER_DELAY = 5000;   // millis
 const int CONTROL_DELAY = 1000;  // micros
 const int IMU_DELAY = 5000; // micros
 constexpr int IMU_FILTER_FREQUENCY = 1000000 / IMU_DELAY; // Hz
-const float MAX_TORQUE = 2.0;
+const float MAX_TORQUE = 1.0;
 PDGains DEFAULT_GAINS = {8.0, 2.0};
 
 const bool ECHO_COMMANDS = false;

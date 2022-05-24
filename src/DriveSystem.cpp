@@ -204,8 +204,8 @@ BLA::Matrix<3> Cross(BLA::Matrix<3> a, BLA::Matrix<3> b){
 
 void DriveSystem::ShiftingUpdate(int leg_index, BLA::Matrix<3> measured_hip_relative_positions, BLA::Matrix<3> reference_hip_relative_positions){
   BLA::Matrix<3> pos_diff = reference_hip_relative_positions - measured_hip_relative_positions;
-  pos_diff(1) = 0; //Only consider upward forces
-  pos_diff(2) = 0;
+  pos_diff(0) = 0; //Only consider upward forces
+  pos_diff(1) = 0;
 
   BLA::Matrix<3> measured_absolute_positions = measured_hip_relative_positions + HipPosition(hip_layout_parameters_, leg_index);
 
