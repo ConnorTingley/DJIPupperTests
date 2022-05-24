@@ -146,13 +146,7 @@ class DriveSystem {
   void SetupIMU(int filter_frequency);
   void UpdateIMU();
 
-
-  BLA::Matrix<3> shift = {0,0,0};
-  float Ki = 0.04;
-  float xShiftLimit = 0.14;
-  float yShiftLimit = 0.08;
-  // Perform integral control over xshift and yshift
-  void ShiftingUpdate(int leg_index, BLA::Matrix<3> measured_hip_relative_positions, BLA::Matrix<3> reference_hip_relative_positions);
+  BLA::Matrix<12> FeedForwardGravity(BLA::Matrix<12> all_measured_hip_relative_positions);
 
   // Calculate motor torques for cartesian position control
   BLA::Matrix<12> CartesianPositionControl();
