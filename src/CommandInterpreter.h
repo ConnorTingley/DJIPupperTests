@@ -24,6 +24,7 @@ struct CheckResult {
   bool do_idle = false;
   bool do_homing = false;
   bool new_debug = false;
+  bool new_phase = false; // CHANGES
   CheckResultFlag flag = CheckResultFlag::kNothing;
 };
 
@@ -33,6 +34,7 @@ class CommandInterpreter {
   ActuatorPositionVector cartesian_position_command_;
   ActuatorActivations activations_;
   ActuatorCurrentVector feedforward_force_;
+  PhaseVector phase_command_; //CHANGES
 
   PDGains3x3 cartesian_gain_command_;
   PDGains gain_command_;
@@ -60,6 +62,8 @@ class CommandInterpreter {
   ActuatorPositionVector LatestPositionCommand();
 
   ActuatorPositionVector LatestCartesianPositionCommand();
+
+  PhaseVector LatestPhaseCommand(); //CHANGES
 
   ActuatorActivations LatestActivations();
 
@@ -206,6 +210,14 @@ CheckResult CommandInterpreter::CheckForMessages() {
       result.new_debug = true;
       print_debug_info_ = obj["debug"].as<bool>();
     }
+    if (obj.containsKey("phase")) {// CHANGES
+      auto json_array = obj["phase"].as<JsonArray>();
+      result.flag = CopyJsonArray(json_array, phase_command_);
+      if (result.flag == CheckResultFlag::kError) {
+        return result;
+      }
+      result.new_phase = result.flag == CheckResultFlag::kNewCommand;
+    }
   }
   return result;
 }
@@ -223,6 +235,12 @@ ActuatorPositionVector CommandInterpreter::LatestCartesianPositionCommand() {
 ActuatorActivations CommandInterpreter::LatestActivations() {
   return activations_;
 }
+
+// CHANGES
+PhaseVector CommandInterpreter::LatestPhaseCommand() {
+  return phase_command_;
+}
+
 
 float CommandInterpreter::LatestKp() { return gain_command_.kp; }
 float CommandInterpreter::LatestKd() { return gain_command_.kd; }

@@ -9,6 +9,7 @@ typedef std::array<float, 12> ActuatorPositionVector;
 typedef std::array<float, 12> ActuatorVelocityVector;
 typedef std::array<float, 12> ActuatorCurrentVector;
 typedef std::array<bool, 12> ActuatorActivations;
+typedef std::array<int, 4> PhaseVector;
 
 template <class T, unsigned int SIZE>
 Print &operator<<(Print &stream, const std::array<T, SIZE> &vec) {
