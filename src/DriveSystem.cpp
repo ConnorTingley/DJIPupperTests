@@ -225,22 +225,11 @@ BLA::Matrix<12> DriveSystem::CartesianPositionControl() {
     auto knee_constraint_torque = (knee_angle > knee_soft_limit) ? position_gains_.kp * (knee_soft_limit - knee_angle) : 0.0;
     auto joint_torques = ~jac * cartesian_forces;
 
-    // Stops current spikes that cause the encoders to loose count
-    float step_time = millis();
-    float dt = (step_time - last_current_time)/1000;
-    last_current_time = step_time;
-    float max_current_this_step = last_current + current_per_s * dt;
-    if (max_current_this_step > max_current_){
-      max_current_this_step = max_current_;
-    }
     // Ensures that the direction of the force is preserved when motors
     // saturate
     float norm = Utils::InfinityNorm3(joint_torques);
-    if (norm > max_current_this_step) {
-      joint_torques = joint_torques * max_current_this_step / norm;
-      last_current = max_current_this_step;
-    }else{
-      //last_current = norm;
+    if (norm > max_current_) {
+      joint_torques = joint_torques * max_current_ / norm;
     }
 
     actuator_torques(3 * leg_index) = joint_torques(0);

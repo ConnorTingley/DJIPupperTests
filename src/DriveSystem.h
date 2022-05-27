@@ -116,9 +116,6 @@ class DriveSystem {
   // Angular velocity in radians/timestep for homing
   float homing_velocity = 0.0005;
 
-  float last_current;
-  float last_current_time;
-  float current_per_s = 100000;
   // Axes grouped into different phases of the homing sequence
   std::array<int, 4> knee_axes_;
   std::array<int, 4> hip_axes_;
