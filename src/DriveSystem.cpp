@@ -197,8 +197,9 @@ BLA::Matrix<3> Cross(BLA::Matrix<3> a, BLA::Matrix<3> b){
 }
 
 /*BLA::Matrix<12> KickbackForces(){
-  BLA::Matrix<3, 3> jac =
+  
 }*/
+
 
 BLA::Matrix<12> DriveSystem::CartesianPositionControl() {
   BLA::Matrix<12> actuator_torques;
