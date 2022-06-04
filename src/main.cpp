@@ -114,6 +114,14 @@ void loop() {
                << interpreter.LatestCartesianPositionCommand();
       }
     }
+    if (r.new_phase) { //CHANGES -- do whatever here
+      Serial << "Phase: " << interpreter.LatestPhaseCommand() << endl; // this is the four vector of 1s or 0s for each leg phase
+      // drive.SetCartesianPositions(interpreter.LatestCartesianPositionCommand());
+      // if (ECHO_COMMANDS) {
+      //   Serial << "Cartesian position command: "
+      //          << interpreter.LatestCartesianPositionCommand();
+      // }
+    }
     if (r.new_kp) {
       drive.SetPositionKp(interpreter.LatestKp());
       if (ECHO_COMMANDS) {
