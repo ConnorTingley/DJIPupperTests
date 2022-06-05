@@ -8,7 +8,7 @@
 #include "Utils.h"
 
 ////////////////////// CONFIG ///////////////////////
-const int PRINT_DELAY = 10000;       // micros, 100hz
+const int PRINT_DELAY = 200000;       // micros, 100hz
 const int HEADER_DELAY = 5000;   // millis
 const int CONTROL_DELAY = 1000;  // micros
 const int IMU_DELAY = 5000; // micros
@@ -193,7 +193,7 @@ void loop() {
   }
   
   if (micros() - last_imu_ts >= IMU_DELAY) {
-    //drive.UpdateIMU(); // Disable until we can figure out why it disrupts activation
+    drive.UpdateIMU(); // Disable until we can figure out why it disrupts activation
     last_imu_ts = micros();
   }
 
@@ -206,7 +206,8 @@ void loop() {
     if (micros() - last_print_ts >= options.print_delay_micros) {
       // drive.PrintStatus(options);
       // logger.AddData(drive.DebugData());
-      drive.PrintMsgPackStatus(options);
+      //drive.PrintMsgPackStatus(options);
+      drive.CalculateBodyController();
       last_print_ts = micros();
     }
     if (print_header_periodically) {

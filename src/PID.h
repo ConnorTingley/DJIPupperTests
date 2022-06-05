@@ -35,5 +35,6 @@ BLA::Matrix<3> AngularPDControl(
         float desired_roll,       // [radians]
         float desired_yaw_rate,   // [radians/sec]
         float desired_pitch_rate, // [radians/sec]
-        float desired_roll_rate   // [radians/sec]
+        float desired_roll_rate,   // [radians/sec]
+        PDGains3x3 gains
         );

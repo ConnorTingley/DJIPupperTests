@@ -200,9 +200,31 @@ BLA::Matrix<3> Cross(BLA::Matrix<3> a, BLA::Matrix<3> b){
   
 }*/
 
+void DriveSystem::CalculateBodyController(){
+  BLA::Matrix<3> rotation_PID_torques = AngularPDControl(
+        imu.yaw,imu.pitch,imu.roll, imu.yaw_rate,imu.pitch_rate, imu.roll_rate,
+        0, 0, 0, 0, 0, cartesian_position_gains_);
+  
+  Serial.print("Yaw: ");
+  Serial.println(imu.yaw);
+  Serial.print("Pitch: ");
+  Serial.println(imu.pitch);
+  Serial.print("Roll: ");
+  Serial.println(imu.roll);
+  
+  
+  Serial.print("X: ");
+  Serial.println(rotation_PID_torques(0));
+  Serial.print("Y: ");
+  Serial.println(rotation_PID_torques(1));
+  Serial.print("Z: ");
+  Serial.println(rotation_PID_torques(2));
+}
+
 
 BLA::Matrix<12> DriveSystem::CartesianPositionControl() {
   BLA::Matrix<12> actuator_torques;
+
   for (int leg_index = 0; leg_index < 4; leg_index++) {
     auto joint_angles = LegJointAngles(leg_index);
     auto joint_velocities = LegJointVelocities(leg_index);
@@ -450,6 +472,10 @@ BLA::Matrix<3> DriveSystem::LegCartesianVelocityReference(uint8_t i) {
 
 BLA::Matrix<3> DriveSystem::LegFeedForwardForce(uint8_t i) {
   return {ff_force_(3 * i), ff_force_(3 * i + 1), ff_force_(3 * i + 2)};
+}
+
+BLA::Matrix<3> DriveSystem::LegBodyControllerForce(uint8_t i) {
+  return {body_controller_force_(3 * i), body_controller_force_(3 * i + 1), body_controller_force_(3 * i + 2)};
 }
 
 void DriveSystem::PrintHeader(DrivePrintOptions options) {

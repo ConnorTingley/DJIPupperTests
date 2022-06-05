@@ -61,6 +61,7 @@ class DriveSystem {
   PDGains3x3 cartesian_position_gains_;
 
   BLA::Matrix<12> ff_force_;
+   BLA::Matrix<12> body_controller_force_;
 
   // Indicates which motors are "active". Those which are inactive get 0
   // torque.
@@ -133,6 +134,7 @@ class DriveSystem {
   RobotSide LegSide(uint8_t leg_index);
 
   BLA::Matrix<3> LegFeedForwardForce(uint8_t leg_index);
+  BLA::Matrix<3> LegBodyControllerForce(uint8_t i);
 
  public:
   // Construct drive system and initialize CAN buses.
@@ -147,6 +149,9 @@ class DriveSystem {
   void UpdateIMU();
 
   float RampUpLimiter();
+
+  // Calculate the body controller's ff forces
+  void CalculateBodyController();
 
   // Calculate motor torques for cartesian position control
   BLA::Matrix<12> CartesianPositionControl();
